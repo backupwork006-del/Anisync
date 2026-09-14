@@ -167,7 +167,7 @@ fun HomeScreen(
             }
         }
 
-        // Active Scrapers Banner
+        // Active Scrapers Banner - Primary focus HiAnime
         item {
             Row(
                 modifier = Modifier
@@ -175,9 +175,8 @@ fun HomeScreen(
                     .padding(horizontal = 16.dp, vertical = 4.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                ScraperChip(name = "AnimePahe", domain = "animepahe.pw", color = PaheBadgeColor, modifier = Modifier.weight(1f))
-                ScraperChip(name = "Gogoanime", domain = "anitaku.to", color = GogoBadgeColor, modifier = Modifier.weight(1f))
-                ScraperChip(name = "HiAnime", domain = "hianime.to", color = HiAnimeBadgeColor, modifier = Modifier.weight(1f))
+                ScraperChip(name = "HiAnime (Primary)", domain = "hianime.to", color = HiAnimeBadgeColor, modifier = Modifier.weight(1.5f))
+                ScraperChip(name = "Sub & Dub", domain = "English / Japanese", color = AnimeCyan, modifier = Modifier.weight(1f))
             }
         }
 

@@ -100,6 +100,7 @@ fun PlayerScreen(
         VideoPlayerView(
             episode = currentEpisode,
             animeTitle = anime.title,
+            animeId = anime.id,
             backdropUrl = anime.bannerUrl.ifEmpty { anime.posterUrl },
             playerViewMode = playerMode,
             selectedSourceIndex = activeSourceIndex,

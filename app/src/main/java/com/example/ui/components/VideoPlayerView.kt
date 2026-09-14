@@ -106,6 +106,7 @@ enum class PlayerViewMode {
 fun VideoPlayerView(
     episode: Episode,
     animeTitle: String,
+    animeId: String = "",
     backdropUrl: String = "",
     playerViewMode: PlayerViewMode = PlayerViewMode.STREAM_PLAYER,
     selectedSourceIndex: Int = 0,
@@ -125,15 +126,15 @@ fun VideoPlayerView(
     val displayDuration = if (realDurationSeconds > 0) realDurationSeconds else totalDurationSeconds
     var isBuffering by remember { mutableStateOf(false) }
     var activePlayerViewMode by remember(playerViewMode) { mutableStateOf(playerViewMode) }
-    var showCaptions by remember { mutableStateOf(false) }
+    var showCaptions by remember { mutableStateOf(true) }
 
-    // Selected server & stream
+    // Selected server & stream (Single primary focus: HiAnime)
     val sources = episode.sources.ifEmpty {
         listOf(
-            StreamSource("MegaCloud (HiAnime)", AnimeSource.HIANIME, "https://hianime.to", "1080p", true),
-            StreamSource("Kwik Stream (AnimePahe)", AnimeSource.ANIMEPAHE, "https://animepahe.pw", "1080p", true),
-            StreamSource("Vidstreaming (Gogoanime)", AnimeSource.GOGOANIME, "https://anitaku.to", "720p", true),
-            StreamSource("StreamWish (Fast)", AnimeSource.GOGOANIME, "https://streamwish.to", "1080p", true)
+            StreamSource("HD-1 (HiAnime)", AnimeSource.HIANIME, "https://hianime.to", "1080p", true),
+            StreamSource("HD-2 Sub (HiAnime)", AnimeSource.HIANIME, "https://hianime.to", "720p", true),
+            StreamSource("English Dub (HiAnime)", AnimeSource.HIANIME, "https://hianime.to", "1080p", true, isDub = true),
+            StreamSource("Fast Server (HiAnime)", AnimeSource.HIANIME, "https://megacloud.blog", "Auto", true)
         )
     }
     var activeSourceIndex by remember(selectedSourceIndex) { mutableIntStateOf(selectedSourceIndex) }
@@ -147,9 +148,10 @@ fun VideoPlayerView(
     var showQualityMenu by remember { mutableStateOf(false) }
     var selectedQuality by remember { mutableStateOf("1080p") }
 
-    // Subtitles list
-    val subtitles = remember(animeTitle, episode.episodeNumber) {
-        AnimeSubtitlesProvider.getSubtitlesFor(animeTitle, episode.episodeNumber)
+    // Subtitles list (Japanese audio with English/Japanese subtitles)
+    val subtitles = remember(animeId, animeTitle, episode.episodeNumber) {
+        val key = animeId.ifEmpty { animeTitle }
+        AnimeSubtitlesProvider.getSubtitlesFor(key, episode.episodeNumber)
     }
     val currentSubtitle = remember(currentPositionSeconds, subtitles) {
         AnimeSubtitlesProvider.findActiveSubtitle(subtitles, currentPositionSeconds)
@@ -169,11 +171,12 @@ fun VideoPlayerView(
     var isMediaStarted by remember { mutableStateOf(false) }
     var activeSurface by remember { mutableStateOf<Surface?>(null) }
 
-    val videoStreamUrl = remember(episode.videoUrl, episode.episodeNumber, animeTitle) {
+    val videoStreamUrl = remember(episode.videoUrl, episode.episodeNumber, animeId, animeTitle) {
         if (episode.videoUrl.isNotEmpty()) {
             episode.videoUrl
         } else {
-            AnimeEpisodeCatalog.getAnimeVideoUrl(animeTitle, episode.episodeNumber)
+            val key = animeId.ifEmpty { animeTitle }
+            AnimeEpisodeCatalog.getAnimeVideoUrl(key, episode.episodeNumber)
         }
     }
 

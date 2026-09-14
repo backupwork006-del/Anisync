@@ -73,13 +73,13 @@ fun SearchScreen(
         // Title
         Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)) {
             Text(
-                text = "Multi-Source Search",
+                text = "Anime Search",
                 color = TextPrimary,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold
             )
             Text(
-                text = "Aggregating AnimePahe, Gogoanime & HiAnime",
+                text = "Search across HiAnime streams (Sub & English Dub)",
                 color = TextSecondary,
                 fontSize = 11.sp
             )

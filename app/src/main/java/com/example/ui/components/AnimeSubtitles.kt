@@ -9,10 +9,11 @@ data class SubtitleEntry(
 
 object AnimeSubtitlesProvider {
 
-    fun getSubtitlesFor(animeTitle: String, episodeNumber: Int): List<SubtitleEntry> {
-        val lower = animeTitle.lowercase()
+    fun getSubtitlesFor(animeIdOrTitle: String, episodeNumber: Int): List<SubtitleEntry> {
+        val lower = animeIdOrTitle.lowercase()
         return when {
-            lower.contains("jujutsu") -> getJujutsuKaisenSubtitles(episodeNumber)
+            lower.contains("titan") || lower.contains("kyojin") || lower.contains("aot") -> getAttackOnTitanSubtitles(episodeNumber)
+            lower.contains("jujutsu") || lower.contains("kaisen") -> getJujutsuKaisenSubtitles(episodeNumber)
             lower.contains("solo leveling") -> getSoloLevelingSubtitles(episodeNumber)
             lower.contains("frieren") -> getFrierenSubtitles(episodeNumber)
             lower.contains("demon slayer") || lower.contains("kimetsu") -> getDemonSlayerSubtitles(episodeNumber)
@@ -23,6 +24,14 @@ object AnimeSubtitlesProvider {
             else -> getGenericAnimeSubtitles(episodeNumber)
         }
     }
+
+    private fun getAttackOnTitanSubtitles(ep: Int): List<SubtitleEntry> = listOf(
+        SubtitleEntry(0, 8, "Year 845: On that day, mankind received a grim reminder...", "845年、その日、人類は思い出した..."),
+        SubtitleEntry(9, 18, "We lived in fear of the Titans, and were disgraced to live in these cages we called walls.", "奴らに支配されていた恐怖を。鳥籠の中に囚われていた屈辱を。"),
+        SubtitleEntry(19, 30, "[Eren] 'I'm going to exterminate them! Every single Titan from this earth!'", "[エレン] 駆逐してやる！この世から、一匹残らず！"),
+        SubtitleEntry(31, 45, "[Mikasa] 'Eren, please stay alive. This world is cruel, yet so beautiful.'", "[ミカサ] エレン、死なないで。世界は残酷だ。そして、とても美しい。"),
+        SubtitleEntry(46, 60, "[Armin] 'The Colossal Titan is over 50 meters tall! The wall has been breached!'", "[アルミン] 超大型巨人だ...！壁が破壊された！")
+    )
 
     private fun getJujutsuKaisenSubtitles(ep: Int): List<SubtitleEntry> = when (ep) {
         1 -> listOf(

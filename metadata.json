@@ -1,0 +1,6 @@
+{
+  "name": "AnimeStream",
+  "description": "Stream anime, manage watchlists, aggregate episodes from multiple sources, and track new episode notifications.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

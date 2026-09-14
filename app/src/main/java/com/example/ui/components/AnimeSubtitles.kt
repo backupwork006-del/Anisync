@@ -25,13 +25,213 @@ object AnimeSubtitlesProvider {
         }
     }
 
-    private fun getAttackOnTitanSubtitles(ep: Int): List<SubtitleEntry> = listOf(
-        SubtitleEntry(0, 8, "Year 845: On that day, mankind received a grim reminder...", "845年、その日、人類は思い出した..."),
-        SubtitleEntry(9, 18, "We lived in fear of the Titans, and were disgraced to live in these cages we called walls.", "奴らに支配されていた恐怖を。鳥籠の中に囚われていた屈辱を。"),
-        SubtitleEntry(19, 30, "[Eren] 'I'm going to exterminate them! Every single Titan from this earth!'", "[エレン] 駆逐してやる！この世から、一匹残らず！"),
-        SubtitleEntry(31, 45, "[Mikasa] 'Eren, please stay alive. This world is cruel, yet so beautiful.'", "[ミカサ] エレン、死なないで。世界は残酷だ。そして、とても美しい。"),
-        SubtitleEntry(46, 60, "[Armin] 'The Colossal Titan is over 50 meters tall! The wall has been breached!'", "[アルミン] 超大型巨人だ...！壁が破壊された！")
-    )
+    private fun getAttackOnTitanSubtitles(ep: Int): List<SubtitleEntry> = when (ep) {
+        1 -> listOf(
+            SubtitleEntry(0, 8, "Year 845, Shiganshina District: On that day, mankind received a grim reminder...", "845年、シガンシナ区――その日、人類は思い出した..."),
+            SubtitleEntry(9, 18, "We lived in fear of the Titans, and were disgraced to live in these cages we called walls.", "奴らに支配されていた恐怖を。鳥籠の中に囚われていた屈辱を。"),
+            SubtitleEntry(19, 30, "[Eren] 'I want to see the outside world! If nobody goes out, who will fight?'", "[エレン] オレは外の世界を見たい！ 誰も外に行かなかったら、誰が戦うんだ！"),
+            SubtitleEntry(31, 45, "[Hannes] 'Peace inside the walls is guaranteed by the 50-meter Wall Maria!'", "[ハンネス] 50メートルの壁がある限り、平和は安泰さ！"),
+            SubtitleEntry(46, 58, "Thunder strikes outside the gate... A colossal red hand grips the wall!", "突如、壁の向こうに轟音と雷光... 超巨大な赤い手が壁の縁を掴む！"),
+            SubtitleEntry(59, 75, "[Armin] 'That wall is 50 meters tall... It's a Titan taller than the wall!!'", "[アルミン] あの壁は50メートルあるんだぞ... 壁よりデカい巨人だ！！")
+        )
+        2 -> listOf(
+            SubtitleEntry(0, 8, "The Fall of Shiganshina Part 2: Titans flood through the destroyed outer gate...", "シガンシナ陥落 その2――破壊された門から巨人が雪崩れ込む..."),
+            SubtitleEntry(9, 20, "[Eren] 'Stop! Carla! Get out from under the roof, please hurry!'", "[エレン] やめろ！母さん！早く瓦礫から出てくれ！"),
+            SubtitleEntry(21, 34, "[Carla Yeager] 'Hannes-san! Take the children and run! Live, Eren! Mikasa!'", "[カルラ] ハンネスさん！子供たちを連れて逃げて！生きるのよ、エレン！ミカサ！"),
+            SubtitleEntry(35, 50, "[Hannes] 'Eren, you couldn't save your mother because you lacked strength. But I couldn't save her because I lacked courage.'", "[ハンネス] エレン、お前が母さんを救えなかったのは力がなかったからだ。オレは勇気がなかったからだ。"),
+            SubtitleEntry(51, 68, "An Armored Titan charges at blinding speed, smashing through Wall Maria's inner gate!", "鎧の巨人が猛スピードで突進し、ウォール・マリアの内門を粉砕する！"),
+            SubtitleEntry(69, 85, "[Eren] 'I'll exterminate them! Every single one from this earth... until none are left!'", "[エレン] 駆逐してやる！この世から...一匹残らず！")
+        )
+        3 -> listOf(
+            SubtitleEntry(0, 8, "Year 848: The 104th Training Corps begins under Keith Shadis...", "848年、第104期訓練兵団の過酷な選別が始まる..."),
+            SubtitleEntry(9, 20, "[Keith Shadis] 'Who are you, maggot?! What did you come here for?!'", "[キース・シャーディス] 貴様は何者だ！何をしにここへ来た！"),
+            SubtitleEntry(21, 32, "[Sasha Braus] 'I... I smelled a steaming potato and took it from the kitchen, sir.'", "[サシャ] 蒸かした芋があまりにも美味しそうだったので...半分どうぞ。"),
+            SubtitleEntry(33, 48, "[Eren] 'Why can't I maintain balance on the vertical maneuvering cables?!'", "[エレン] なんでバランスが取れないんだ！オレには素質がないのか？！"),
+            SubtitleEntry(49, 65, "[Keith Shadis] 'Change his belt clasp. The equipment was defective from the start.'", "[キース] ベルトの金具を交換しろ。機材が不良品だっただけだ。"),
+            SubtitleEntry(66, 80, "[Eren] 'I did it! I can balance now! Look at me, Mikasa!'", "[エレン] できた！浮いたぞ！見たか、ミカサ！")
+        )
+        4 -> listOf(
+            SubtitleEntry(0, 8, "Graduation of the 104th Cadet Corps: Five years after the fall of Wall Maria...", "第104期訓練兵団卒業――ウォール・マリア陥落から5年..."),
+            SubtitleEntry(9, 22, "[Cadet Ranks] 'Top 10 Graduates: Mikasa, Reiner, Bertholdt, Annie, Eren, Jean, Connie, Sasha, Krista, Marco.'", "[首席〜上位] ミカサ、ライナー、ベルトルト、アニ、エレン、ジャン、コニー、サシャ、クリスタ、マルコ。"),
+            SubtitleEntry(23, 36, "[Jean Kirstein] 'Everyone with brains chooses the Interior Military Police for comfort!'", "[ジャン] 頭のいい奴は内地の憲兵団に行って快適に暮らすのさ！"),
+            SubtitleEntry(37, 50, "[Eren] 'I'm joining the Scout Regiment to reclaim the territory mankind lost.'", "[エレン] オレは調査兵団に入って、奪われた人類の領土を取り戻す。"),
+            SubtitleEntry(51, 65, "Trost District Wall: Eren and squad clean cannons along the ramparts...", "トロスト区壁上――大砲の手入れをするエレンたち..."),
+            SubtitleEntry(66, 80, "Yellow lightning cracks! The Colossal Titan looms face to face with Eren!", "黄金の雷撃！超大型巨人が5年ぶりにエレンの目の前に出現する！")
+        )
+        5 -> listOf(
+            SubtitleEntry(0, 8, "The Defense of Trost District: Wall Rose outer gate smashed open!", "トロスト区攻防戦――ウォール・ローゼの扉が破られる！"),
+            SubtitleEntry(9, 22, "[Eren] 'Target the Titan's nape! It's right in front of us!'", "[エレン] 狙うはうなじだ！目の前にいるぞ！"),
+            SubtitleEntry(23, 35, "34th Cadet Squad deployed: Abnormal Titan ambush in the city ruins!", "第34班出撃――市街地で奇行種の急襲を受ける！"),
+            SubtitleEntry(36, 50, "[Armin] 'Thomas! No! The abnormal Titan swallowed him whole!'", "[アルミン] トーマス！嘘だろ！奇行種に丸呑みされた！"),
+            SubtitleEntry(51, 65, "Eren's leg severed by a Titan's bite! Armin frozen in terror inside a Titan's jaws!", "エレンの左足が巨人に食いちぎられる！茫然自失のアルミンが巨人の口の中へ！"),
+            SubtitleEntry(66, 82, "[Eren] 'Armin! Grab my hand! We swore to see the sea together!'", "[エレン] アルミン！手を取れ！オレたちは一緒に海を見るんだろ！！")
+        )
+        6 -> listOf(
+            SubtitleEntry(0, 8, "Mikasa Ackerman's childhood memories awaken amidst the despair of Trost...", "ミカサ・アッカーマンの回想――残酷で美しい世界の記憶..."),
+            SubtitleEntry(9, 22, "[Mikasa] 'My father and mother were murdered right before my eyes by human traffickers.'", "[ミカサ] お父さんとお母さんは、目の前で人買いに殺された。"),
+            SubtitleEntry(23, 38, "[Eren] 'Fight! If you win, you live! If you don't fight, you cannot win!'", "[エレン] 戦え！戦わなければ勝てない！勝てば生きる！"),
+            SubtitleEntry(39, 54, "Mikasa grasps the knife handle... Her awakened power shatters the floorboard!", "ナイフの柄を強く握るミカサ...覚醒した力が床板を踏み抜く！"),
+            SubtitleEntry(55, 70, "[Mikasa] 'From that moment on, I had absolute control over my body and mind.'", "[ミカサ] その瞬間から、私は自分の体を完璧に支配できた。"),
+            SubtitleEntry(71, 85, "[Mikasa] 'Eren wrapped his red scarf around me... It was so warm.'", "[ミカサ] エレンが赤いマフラーを巻いてくれた...とても温かかった。")
+        )
+        7 -> listOf(
+            SubtitleEntry(0, 8, "Armin informs Mikasa that the 34th Squad was wiped out...", "アルミンはミカサに第34班の全滅を涙ながらに告げる..."),
+            SubtitleEntry(9, 22, "[Mikasa] 'I am strong. Stronger than any of you. Even alone, I will fight.'", "[ミカサ] 私は強い。あなた達より強い。一人でも巨人を倒せる。"),
+            SubtitleEntry(23, 36, "Mikasa runs out of compressed gas and falls into an abandoned alley...", "ガス欠となり人気のない路地裏へ墜落するミカサ..."),
+            SubtitleEntry(37, 52, "A 15-meter Titan approaches her... but another mysterious Rogue Titan suddenly roars!", "迫り来る15メートル級の巨人...そこへ漆黒の髪を持つ巨人が猛然と乱入する！"),
+            SubtitleEntry(53, 70, "The Rogue Titan brutally punches other Titans, displaying martial arts mastery!", "他の巨人を殴り殺し、格闘技の構えで屠る謎の巨人！"),
+            SubtitleEntry(71, 85, "[Armin] 'A Titan... that exclusively attacks other Titans?!'", "[アルミン] 巨人が...巨人を殺しているのか？！")
+        )
+        8 -> listOf(
+            SubtitleEntry(0, 8, "Trapped cadets at the Military HQ Supply Depot formulate a rescue plan...", "補給所に孤立した訓練兵たち、命がけの補給奪還作戦..."),
+            SubtitleEntry(9, 24, "[Armin] 'We will blind the seven 4-meter Titans simultaneously, then strike napes!'", "[アルミン] 散弾銃で7体の視界を同時に奪い、背後からうなじを削ぐ！"),
+            SubtitleEntry(25, 40, "Sasha and Connie panic, but Mikasa and Annie execute flawless coordinated slashes!", "サシャが仕留め損ねるも、ミカサとアニが瞬時に救援！作戦成功！"),
+            SubtitleEntry(41, 56, "Outside, the mysterious Rogue Titan collapses after annihilating 20 Titans...", "外では、20体以上の巨人を殲滅した謎の巨人が力尽きて倒れる..."),
+            SubtitleEntry(57, 72, "Steam billows from the nape... Eren Yeager emerges alive with healed limbs!", "うなじの肉が裂け、蒸気の中から手足の再生したエレンが現れる！"),
+            SubtitleEntry(73, 88, "[Mikasa] 'Eren! His heartbeat is strong... He is truly alive!'", "[ミカサ] エレン！心臓の音が聞こえる...本当に生きている！")
+        )
+        9 -> listOf(
+            SubtitleEntry(0, 8, "Garrison Commander Kitz Woermann surrounds Eren, Mikasa, and Armin with cannons...", "キッツ・ヴェールマン率いる駐屯兵団守備隊がエレンたちを包囲..."),
+            SubtitleEntry(9, 24, "[Kitz] 'Cadet Yeager! Are you human, or a monster wearing human flesh?!'", "[キッツ] 訓練兵エレン・イェーガー！貴様は人間か、怪物か？！"),
+            SubtitleEntry(25, 40, "[Eren] 'I don't understand what happened to me! But I am human!'", "[エレン] オレにも何が起きたかわからない！だがオレは人間です！"),
+            SubtitleEntry(41, 56, "[Kitz] 'Cannons, fire!! Exterminate the demon!'", "[キッツ] 砲兵隊、撃てーッ！！悪魔を消し去れ！"),
+            SubtitleEntry(57, 72, "Eren bites his hand! A massive bone ribcage and muscle shield blocks the cannonball!", "エレンが自分の手を噛む！巨大な骨格と肉の盾が砲弾を弾き飛ばす！"),
+            SubtitleEntry(73, 88, "[Eren] 'In the basement of my home in Shiganshina... Dad said the truth is hidden there.'", "[エレン] シガンシナの生家の地下室...父さんはそこに世界の秘密があると言っていた。")
+        )
+        10 -> listOf(
+            SubtitleEntry(0, 8, "Armin steps forward alone to negotiate with the Garrison Regiment...", "アルミンはエレンの巨人の力を人類のために使うべく一人進み出る..."),
+            SubtitleEntry(9, 25, "[Armin] 'I am a soldier sworn to devote my heart to the recovery of human territory!'", "[アルミン] 私は人類の復興に心臓を捧げると誓った兵士です！"),
+            SubtitleEntry(26, 42, "[Armin] 'If we combine Eren's Titan abilities with the Garrison's soldiers, reclaiming Trost is possible!'", "[アルミン] 彼の巨人の力と駐屯兵団の力を合わせれば、トロスト区奪還も可能です！"),
+            SubtitleEntry(43, 58, "Commander Dot Pixis steps in: 'At ease, soldier. Your salute was magnificent.'", "[ドット・ピクシス] これ以上は無用じゃ。見事な敬礼であったぞ、兵士よ。"),
+            SubtitleEntry(59, 74, "[Pixis] 'Cadet Yeager, can you carry that giant boulder and plug the hole in Wall Rose?'", "[ピクシス] イェーガー訓練兵、あの巨大な岩を運び、壁の穴を塞ぐことができるか？"),
+            SubtitleEntry(75, 90, "[Eren] 'I don't know if I can... but I will do it. I will plug the hole!'", "[エレン] できるかどうかはわかりません...でも、やります！穴を塞ぎます！")
+        )
+        11 -> listOf(
+            SubtitleEntry(0, 8, "Operation to Reclaim Trost District commences under Commander Pixis...", "ピクシス総司令指揮のもと、トロスト区奪還作戦が発動..."),
+            SubtitleEntry(9, 24, "[Pixis] 'Do not let humanity die within these walls like cattle!'", "[ピクシス] 人類が家畜のように壁の中で滅びることを許すな！"),
+            SubtitleEntry(25, 42, "Elite Garrison Squad assembled: Ian Dietrich, Rico Brzenska, Mitabi Jarnach.", "精鋭護衛部隊集結――イアン、リコ、ミタビ各班長。"),
+            SubtitleEntry(43, 58, "Eren sprints toward the giant boulder alongside Mikasa and the elite guard.", "巨岩を目指して全力疾走するエレンとミカサ、精鋭部隊。"),
+            SubtitleEntry(59, 75, "Eren bites his thumb! Green lightning erupts as he transforms into the Attack Titan!", "エレンが親指を噛み切る！緑の雷光とともに進撃の巨人へと変身！"),
+            SubtitleEntry(76, 90, "Titan Eren roars... but turns around and swings a crushing fist toward Mikasa!", "咆哮を上げる巨人エレン...だが突如振り返り、ミカサに向けて拳を振り下ろす！")
+        )
+        12 -> listOf(
+            SubtitleEntry(0, 8, "Rico fires the red flare: 'Operation has failed! The Titan is out of control!'", "[リコ] 赤い信煙弾を発射！作戦失敗！巨人が暴走した！"),
+            SubtitleEntry(9, 24, "[Ian Dietrich] 'Wait! We cannot abandon Yeager! Protect him to the last soldier!'", "[イアン] 待て！イェーガーを見捨てるわけにはいかん！彼を守り抜け！"),
+            SubtitleEntry(25, 42, "Titan Eren slumps against the boulder, trapped inside a hallucinatory dream of home...", "巨岩に凭れかかり、温かい生家の幻覚夢に閉じ込められるエレン..."),
+            SubtitleEntry(43, 58, "[Armin] 'Eren! Wake up! The Titans are closing in on our comrades!'", "[アルミン] エレン！起きろ！仲間たちが巨人に食われているんだぞ！"),
+            SubtitleEntry(59, 74, "Armin drives his blade deep into the Titan's nape, piercing Eren's shoulder!", "アルミンが巨人のうなじに刃を突き立て、エレンの肩を貫く！"),
+            SubtitleEntry(75, 90, "[Armin] 'Eren, why do you want to go beyond the walls?! Tell me!'", "[アルミン] エレン、どうしてお前は壁の外に行きたいんだ？！教えてくれ！")
+        )
+        13 -> listOf(
+            SubtitleEntry(0, 8, "Eren opens his eyes inside the Titan's fiery nape...", "エレンが燃える巨人のうなじの中で目覚める..."),
+            SubtitleEntry(9, 25, "[Eren] 'Because I was born into this world!!'", "[エレン] オレが、この世に生まれたからだ！！"),
+            SubtitleEntry(26, 42, "Titan Eren lifts the colossal boulder onto his shoulders, veins bulging with steam!", "巨岩を両肩に担ぎ上げる巨人エレン、蒸気が凄まじく噴き上がる！"),
+            SubtitleEntry(43, 60, "[Ian] 'Protect the Titan! Sacrifice your lives so he can reach the gate!'", "[イアン] 巨人を死守せよ！命を賭して門まで護衛しろ！"),
+            SubtitleEntry(61, 78, "With a colossal roar, Eren slams the boulder into the breach, sealing Wall Rose!", "咆哮とともに巨岩を穴へ叩き込み、ウォール・ローゼの扉を完全に塞ぐ！"),
+            SubtitleEntry(79, 95, "[Rico] 'Humanity... has won its very first victory against the Titans!!'", "[リコ] 人類が...初めて巨人に勝ったぞ！！")
+        )
+        14 -> listOf(
+            SubtitleEntry(0, 8, "Special Military Tribunal: Premier Darius Zackly presides over Eren's fate...", "特別軍事裁判開廷――総統ダリス・ザックレーがエレンの処遇を決める..."),
+            SubtitleEntry(9, 24, "[Nile Dawk] 'The Military Police demands Yeager's immediate dissection and execution.'", "[ナイル・ドーク] 憲兵団はイェーガーの即時解剖と処分を要求する。"),
+            SubtitleEntry(25, 42, "[Erwin Smith] 'The Scout Regiment requests custody of Eren to launch a mission to retake Wall Maria.'", "[エルヴィン] 調査兵団はエレンを預かり、ウォール・マリア奪還の遠征を提案します。"),
+            SubtitleEntry(43, 60, "[Eren] 'You cowards! If you won't fight, just shut up and invest everything in me!'", "[エレン] 臆病者どもめ！戦えないなら黙ってオレに全部投資しろ！"),
+            SubtitleEntry(61, 78, "Captain Levi steps forward and brutally kicks Eren, shattering his tooth to prove control.", "リヴァイ兵長が前に出てエレンを激しく蹴り飛ばし、制圧力を証明する。"),
+            SubtitleEntry(79, 95, "[Levi] 'This is my personal opinion: Pain is the most effective tool of discipline.'", "[リヴァイ] これは持論だが、躾に一番効くのは痛みだと思う。")
+        )
+        15 -> listOf(
+            SubtitleEntry(0, 8, "Former Scout Regiment Headquarters: An ancient castle in the wilderness...", "旧調査兵団本部――荒野に佇む古城へ配属されるエレン..."),
+            SubtitleEntry(9, 22, "[Levi] 'First task: Clean every speck of dust from the upper floors to the cellar.'", "[リヴァイ] まずは掃除だ。上階から地下室まで埃一つ残すな。"),
+            SubtitleEntry(23, 40, "Special Operations Squad (Levi Squad): Eld Jinn, Oluo Bozado, Petra Ral, Gunther Schultz.", "特別作戦班（リヴァイ班）――エルド、オルオ、ペトラ、グンタ。"),
+            SubtitleEntry(41, 58, "[Hange Zoe] 'Eren! Let me tell you about the captured Titans Sawney and Beane!'", "[ハンジ・ゾエ] エレン！捕獲した巨人ソニーとビーンについて語り合おう！"),
+            SubtitleEntry(59, 75, "Hange talks through the entire night about Titan physiology and lack of digestive organs.", "巨人の生態と消化器官の欠如について夜通し熱弁を振るうハンジ。"),
+            SubtitleEntry(76, 92, "Dawn arrives: News breaks that Sawney and Beane were assassinated by an unknown traitor!", "夜明け、捕獲されていた2体の巨人が何者かによって暗殺された！")
+        )
+        16 -> listOf(
+            SubtitleEntry(0, 8, "Commander Erwin delivers a harrowing speech to the remaining 104th recruits...", "エルヴィン団長が第104期兵たちに過酷な調査兵団の実態を語る..."),
+            SubtitleEntry(9, 25, "[Erwin] 'In the past 4 years, over 60% of our Scouts have died on missions outside the walls.'", "[エルヴィン] 過去4年で6割以上の兵士が壁外調査で死亡した。"),
+            SubtitleEntry(26, 42, "[Erwin] 'Those willing to dedicate their hearts despite knowing this, remain!'", "[エルヴィン] それでも心臓を捧げられる者だけ、ここに残れ！"),
+            SubtitleEntry(43, 60, "Many cadets weep and leave, but Jean, Connie, Sasha, Krista, Ymir, and Reiner stand firm.", "多くの兵が去る中、ジャン、コニー、サシャ、クリスタ、ユミル、ライナーが残る。"),
+            SubtitleEntry(61, 78, "[Jean] 'I don't want to die with ashes and regrets like Marco did.'", "[ジャン] マルコの死んだ理由もわからないまま、悔いを残したくない。"),
+            SubtitleEntry(79, 95, "[Erwin] 'You have brave faces. I welcome you all to the Scout Regiment!'", "[エルヴィン] いい面構えだ。諸君らを調査兵団に心から歓迎しよう！")
+        )
+        17 -> listOf(
+            SubtitleEntry(0, 8, "The 57th Exterior Scouting Mission departs through the Karanes District gate...", "第57回壁外調査――カラネス区の門から大部隊が出撃する..."),
+            SubtitleEntry(9, 24, "Erwin's Long-Range Scouting Formation unfolds across the open plains using smoke flares.", "煙弾を用いたエルヴィン考案の長距離索敵陣形が荒野に展開。"),
+            SubtitleEntry(25, 42, "Armin's squad on the right wing encounters an agile 14-meter Female Titan!", "右翼側のアルミン班が、驚異的な俊敏さを持つ女型の巨人と遭遇！"),
+            SubtitleEntry(43, 60, "[Armin] 'She's not an abnormal... She's an intelligent human Titan, just like Eren!'", "[アルミン] こいつは奇行種じゃない...エレンと同じ、知性を持った人間だ！"),
+            SubtitleEntry(61, 78, "Female Titan spares Armin after inspecting his face under his hood.", "フードを剥ぎ、アルミンの顔を確認した女型の巨人は殺さずに去る。"),
+            SubtitleEntry(79, 95, "[Armin] 'She's targeting Eren in the central rear squad!'", "[アルミン] あいつの狙いは中央後方にいるエレンだ！")
+        )
+        18 -> listOf(
+            SubtitleEntry(0, 8, "The expedition is led into the massive Forest of Giant Trees...", "索敵部隊は突如、巨木が立ち並ぶ巨大樹の森へと誘導される..."),
+            SubtitleEntry(9, 24, "[Cadets] 'Why are we entering the forest where wagon visibility is lost?!'", "[兵士たち] なぜ馬車が通れない森に入るんだ？！"),
+            SubtitleEntry(25, 42, "Female Titan charges behind Levi Squad, mercilessly swatting Scout interceptors!", "女型の巨人がリヴァイ班の後方に迫り、迎撃する調査兵を薙ぎ払う！"),
+            SubtitleEntry(43, 60, "[Eren] 'Captain! Let me transform! I can kill her right now!'", "[エレン] 兵長！オレに変身させてください！今なら倒せます！"),
+            SubtitleEntry(61, 78, "[Levi] 'Choose for yourself, Eren. Whether you trust yourself, or trust your comrades.'", "[リヴァイ] 選べ、エレン。自分を信じるか、仲間を信じるか。"),
+            SubtitleEntry(79, 95, "[Petra] 'Eren, please believe in us!'", "[ペトラ] エレン、私たちを信じて！")
+        )
+        19 -> listOf(
+            SubtitleEntry(0, 8, "Eren holds back his bite and chooses to trust the Levi Squad...", "エレンは噛むのを止め、リヴァイ班の仲間を信じる決断を下す..."),
+            SubtitleEntry(9, 24, "Levi fires an acoustic bullet straight ahead toward the canopy clearing!", "リヴァイが前方へ音響弾を発射！森の開けた場所へ女型の巨人を誘導！"),
+            SubtitleEntry(25, 42, "Commander Erwin's hidden Special Target Restraint Weapon triggers dozens of steel harpoons!", "エルヴィンが仕掛けた拘束兵器から無数の鉄線ハープーンが一斉に発射される！"),
+            SubtitleEntry(43, 60, "The Female Titan is completely pinned down under hundreds of heavy wire cables!", "女型の巨人は無数のワイヤーによって完全に身動きを封じられる！"),
+            SubtitleEntry(61, 78, "[Levi] 'Good work, everyone. Our primary objective is achieved.'", "[リヴァイ] よくやった。これで作戦目的は達成だ。"),
+            SubtitleEntry(79, 95, "[Eren] 'The Commander planned this entire trap without telling ordinary soldiers!'", "[エレン] 団長は一般兵にすら作戦を隠してこの罠を張っていたのか！")
+        )
+        20 -> listOf(
+            SubtitleEntry(0, 8, "Erwin and Levi stand atop the Female Titan's head, attempting to extract the shifter...", "エルヴィンとリヴァイが頭上に降り立ち、うなじの本体を暴こうとする..."),
+            SubtitleEntry(9, 24, "The Female Titan hardens her diamond-crystal skin to protect her nape from blades!", "女型の巨人はうなじの皮膚を結晶化させて刃の侵入を阻む！"),
+            SubtitleEntry(25, 42, "[Levi] 'Hey, are you enjoying yourself in there? We'll peel you out eventually.'", "[リヴァイ] おい、中で楽しんでるか？ どうせ引きずり出してやるがな。"),
+            SubtitleEntry(43, 60, "The Female Titan lets out a deafening high-pitch scream across the entire forest!", "女型の巨人が森中に響き渡る凄まじい絶叫を上げる！"),
+            SubtitleEntry(61, 78, "Pure Titans from all directions rush in ignoring humans, swarming and devouring her body!", "四方八方から巨人が群がり、人間を無視して女型の肉体を喰らい尽くす！"),
+            SubtitleEntry(79, 95, "[Erwin] 'She summoned them to destroy the evidence! Retreat to horses!'", "[エルヴィン] 証拠隠滅のために巨人を呼んだのか！全員、馬へ戻れ！")
+        )
+        21 -> listOf(
+            SubtitleEntry(0, 8, "A mysterious figure in Scout cloak ambushes Gunther Schultz in the forest...", "森の中、調査兵のマントを羽織った謎の人物がグンタを奇襲殺害..."),
+            SubtitleEntry(9, 24, "Lightning strikes! The Female Titan regenerates and reappears in pursuit!", "雷光！女型の巨人が再び姿を現し、リヴァイ班を猛追する！"),
+            SubtitleEntry(25, 42, "Eld, Oluo, and Petra fight valiantly, blinding her eyes and severing arm muscles!", "エルド、オルオ、ペトラが果敢に攻め、両目を奪い腕の筋肉を削ぐ！"),
+            SubtitleEntry(43, 60, "Female Titan accelerates one-eye regeneration... Eld is bitten in half, Petra crushed against a tree!", "片目の再生を優先させた女型が反撃...エルドが噛み砕かれ、ペトラが無惨に散る！"),
+            SubtitleEntry(61, 78, "Seeing his fallen comrades, Eren roars in grief and transforms into the Attack Titan!", "仲間の死を目の当たりにしたエレンが慟哭とともに巨人化！激突する！"),
+            SubtitleEntry(79, 95, "Female Titan's hardened roundhouse kick decapitates Eren's Titan, capturing his human body!", "硬質化したハイキックがエレンの巨人の首を刎ね、本体を口内に咥えて逃走！")
+        )
+        22 -> listOf(
+            SubtitleEntry(0, 8, "Mikasa pursues the Female Titan in wild vengeance...", "復讐に燃えるミカサが単身、女型の巨人を追撃する..."),
+            SubtitleEntry(9, 24, "Captain Levi arrives: 'Ackerman, maintain distance! We only need to rescue Eren!'", "[リヴァイ] アッカーマン、距離を保て！目的はエレンの奪還だけだ！"),
+            SubtitleEntry(25, 42, "Levi unleashes his whirlwind blade dance, slicing the Female Titan's tendons in seconds!", "リヴァイが神速の回転斬撃を繰り出し、女型の全身の腱を一瞬で切断！"),
+            SubtitleEntry(43, 60, "Mikasa aims for the nape, Levi injures his ankle protecting her from a counter-swing!", "ミカサがうなじを狙い、リヴァイが彼女を庇って足首を負傷！"),
+            SubtitleEntry(61, 78, "Levi slashes open the jaw and retrieves saliva-covered Eren safely.", "リヴァイが女型の顎を切り裂き、エレンを無事救出する。"),
+            SubtitleEntry(79, 95, "The defeated Scout Regiment returns to Wall Rose under the silent, grieving gaze of citizens.", "失意の調査兵団は市民の冷たい視線を受けながら壁内へと帰還する。")
+        )
+        23 -> listOf(
+            SubtitleEntry(0, 8, "Stohess District, Wall Sina: The Military Police patrols the cobblestone streets...", "ウォール・シーナ、ストヘス区――憲兵団が街を巡回する..."),
+            SubtitleEntry(9, 24, "[Armin] 'Annie, please help Eren escape out of the city through the underground tunnel.'", "[アルミン] アニ、エレンを地下道から逃がすのに協力してほしい。"),
+            SubtitleEntry(25, 42, "[Annie Leonhart] 'Why would I help a rebel escape the Military Police?'", "[アニ・レオンハート] なぜ私が反逆者の逃走を手助けしなきゃいけないの？"),
+            SubtitleEntry(43, 60, "[Armin] 'Because you didn't kill me back in the forest... Annie, please.'", "[アルミン] あの森で、君は僕を殺さなかったからだ...アニ。"),
+            SubtitleEntry(61, 78, "Annie halts at the entrance of the dark underground stairway, refusing to step down.", "薄暗い地下階段の入り口で足を止め、降りることを拒否するアニ。"),
+            SubtitleEntry(79, 95, "[Annie] 'I'm glad... that I could be a good person to you, Armin.'", "[アニ] あんたのいい人でいられて...よかったよ、アルミン。")
+        )
+        24 -> listOf(
+            SubtitleEntry(0, 8, "Annie flicks the ring blade on her finger, triggering an enormous lightning blast!", "アニが指輪の隠し刃を弾き、巨大な雷光がストヘス区を揺るがす！"),
+            SubtitleEntry(9, 24, "The Female Titan emerges in the middle of the crowded city of Stohess!", "市街地のど真ん中に女型の巨人が出現！瓦礫が降り注ぐ！"),
+            SubtitleEntry(25, 42, "Eren is trapped under collapsed tunnel stones, unable to find the resolve to transform.", "地下道の崩落に挟まれ、アニへの疑念から変身できないエレン。"),
+            SubtitleEntry(43, 60, "[Mikasa] 'Eren, does some special feeling for Annie prevent you from fighting her?!'", "[ミカサ] エレン、アニに何か特別な感情があって戦えないの？！"),
+            SubtitleEntry(61, 78, "[Mikasa] 'The world is cruel! Stand up and fight!'", "[ミカサ] 世界は残酷なんだ！立ち上がって戦いなさい！"),
+            SubtitleEntry(79, 95, "[Eren] 'I will destroy it all... I will destroy the whole world!!'", "[エレン] オレが...この世の全てを壊してやる！！")
+        )
+        25 -> listOf(
+            SubtitleEntry(0, 8, "Season 1 Climax: Eren's berserk flaming Titan clashes with Annie atop Stohess!", "第1期クライマックス――炎を纏う暴走エレンとアニが激突！"),
+            SubtitleEntry(9, 24, "Titan fists shatter buildings as Eren overwhelms the Female Titan with sheer fury!", "圧倒的な怒りで女型の巨人を叩き伏せ、建物を粉砕するエレン！"),
+            SubtitleEntry(25, 42, "Annie attempts to scale the 50-meter Wall Sina to escape...", "逃走を図り、50メートルのウォール・シーナの壁面を登り始めるアニ..."),
+            SubtitleEntry(43, 60, "Mikasa slices off Annie's fingers: 'Annie... fall.'", "ミカサが壁上のアニの指を切り落とす――「アニ...落ちて。」"),
+            SubtitleEntry(61, 78, "Female Titan crashes to the earth; Annie encases herself in an indestructible crystal cocoon!", "地上へ叩きつけられたアニは、壊せない水晶の繭に身を包み眠りにつく。"),
+            SubtitleEntry(79, 95, "Cracks form in the wall where Annie's fingers dug in... A Titan's living eye gazes out from within!", "アニの爪痕から壁の破片が剥がれ落ち...壁の中から生きている巨人の顔が現れる！")
+        )
+        else -> listOf(
+            SubtitleEntry(0, 8, "Attack on Titan Season 1 • Episode $ep: Official Stream", "進撃の巨人 第${ep}話 本編"),
+            SubtitleEntry(9, 20, "High Definition dual audio Japanese with English Subtitles.", "HD高精細ストリーミング 日本語音声 / 英語字幕"),
+            SubtitleEntry(21, 45, "Watch Eren, Mikasa, and Armin fight for humanity's survival.", "人類の自由と生存をかけた戦い")
+        )
+    }
 
     private fun getJujutsuKaisenSubtitles(ep: Int): List<SubtitleEntry> = when (ep) {
         1 -> listOf(

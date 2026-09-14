@@ -260,12 +260,19 @@ fun VideoPlayerView(
             isPlayerPrepared = false
             isMediaStarted = false
             isBuffering = true
-            mediaPlayerRef?.run {
-                try {
-                    reset()
-                } catch (e: Exception) { }
-            }
-            val mp = (mediaPlayerRef ?: MediaPlayer()).apply {
+            try {
+                mediaPlayerRef?.run {
+                    try {
+                        reset()
+                    } catch (e: Exception) { }
+                    try {
+                        release()
+                    } catch (e: Exception) { }
+                }
+            } catch (e: Exception) { }
+            mediaPlayerRef = null
+
+            val mp = MediaPlayer().apply {
                 setSurface(surface)
                 try {
                     setAudioAttributes(

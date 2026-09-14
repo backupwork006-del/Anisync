@@ -97,29 +97,31 @@ fun PlayerScreen(
             .background(DarkBackground)
     ) {
         // Video Player HUD
-        VideoPlayerView(
-            episode = currentEpisode,
-            animeTitle = anime.title,
-            animeId = anime.id,
-            backdropUrl = anime.bannerUrl.ifEmpty { anime.posterUrl },
-            playerViewMode = playerMode,
-            selectedSourceIndex = activeSourceIndex,
-            onPlayerViewModeChange = { playerMode = it },
-            onSourceIndexChange = { activeSourceIndex = it },
-            onBack = { viewModel.navigateTo(Screen.AnimeDetail(anime.id)) },
-            onNextEpisode = {
-                val next = currentEpNum + 1
-                if (next <= anime.currentEpisodes) {
-                    currentEpNum = next
+        androidx.compose.runtime.key(currentEpisode.episodeNumber) {
+            VideoPlayerView(
+                episode = currentEpisode,
+                animeTitle = anime.title,
+                animeId = anime.id,
+                backdropUrl = currentEpisode.thumbnail.ifEmpty { anime.bannerUrl.ifEmpty { anime.posterUrl } },
+                playerViewMode = playerMode,
+                selectedSourceIndex = activeSourceIndex,
+                onPlayerViewModeChange = { playerMode = it },
+                onSourceIndexChange = { activeSourceIndex = it },
+                onBack = { viewModel.navigateTo(Screen.AnimeDetail(anime.id)) },
+                onNextEpisode = {
+                    val next = currentEpNum + 1
+                    if (next <= anime.currentEpisodes) {
+                        currentEpNum = next
+                    }
+                },
+                onProgressUpdate = { frac ->
+                    if (frac > 0.85f) {
+                        // Mark watched
+                        viewModel.updateWatchlistProgress(anime.id, currentEpNum)
+                    }
                 }
-            },
-            onProgressUpdate = { frac ->
-                if (frac > 0.85f) {
-                    // Mark watched
-                    viewModel.updateWatchlistProgress(anime.id, currentEpNum)
-                }
-            }
-        )
+            )
+        }
 
         // Episode Information & Quick Actions
         LazyColumn(

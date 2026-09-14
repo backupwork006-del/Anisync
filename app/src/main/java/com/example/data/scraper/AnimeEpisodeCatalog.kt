@@ -27,11 +27,17 @@ object AnimeEpisodeCatalog {
     private const val CHAINSAW_VIDEO_URL = "https://archive.org/download/chainsaw-man-the-movie-reze-arc-official-teaser-2-1080p-24fps-h-264-128kbit-aac/%E2%80%9DChainsaw%20Man%20%E2%80%93%20The%20Movie%3B%20Reze%20Arc%E2%80%9D%20Official%20Teaser%202%EF%BC%8F%E5%89%A7%E5%A0%B4%E7%89%88%E3%80%8E%E3%83%81%E3%82%A7%E3%83%B3%E3%82%BD%E3%83%BC%E3%83%9E%E3%83%B3%20%E3%83%AC%E3%82%AC%E7%AF%87%E3%80%8F%E7%89%B9%E5%A0%B1%20%281080p_24fps_H264-128kbit_AAC%29.mp4"
     private const val ANIME_SAKUGA_VIDEO_URL = "https://archive.org/download/action-sakuga-mad_202503/Action%20%E3%82%A2%E3%82%AF%E3%82%B7%E3%83%A7%E3%83%B3%20Sakuga%20%E4%BD%9C%E7%94%BB%20MAD.mp4"
 
+    fun getAttackOnTitanEpisodeVideo(episodeNumber: Int): String {
+        val ep = episodeNumber.coerceIn(1, 25)
+        return "https://archive.org/download/shingeki-no-kyojin-episode-1/shingeki-no-kyojin-episode-$ep.mp4"
+    }
+
     fun getAnimeVideoUrl(animeId: String, episodeNumber: Int = 1): String {
         return when (animeId) {
+            "attack-on-titan" -> getAttackOnTitanEpisodeVideo(episodeNumber)
             "jujutsu-kaisen-s2" -> getJujutsuKaisenEpisodeVideo(episodeNumber)
             "chainsaw-man" -> getChainsawEpisodeVideo(episodeNumber)
-            else -> ANIME_SAKUGA_VIDEO_URL
+            else -> getAttackOnTitanEpisodeVideo(episodeNumber)
         }
     }
 
@@ -65,18 +71,18 @@ object AnimeEpisodeCatalog {
         }
         return listOf(
             StreamSource(
+                serverName = "Direct Stream (AOT Full Episode)",
+                provider = AnimeSource.HIANIME,
+                streamUrl = getAttackOnTitanEpisodeVideo(epNum),
+                quality = "1080p",
+                isEmbed = false,
+                isDub = false
+            ),
+            StreamSource(
                 serverName = "HD-1 (HiAnime)",
                 provider = AnimeSource.HIANIME,
                 streamUrl = "https://hianime.to/watch/$hianimeSlug?ep=$epNum",
                 quality = "1080p",
-                isEmbed = true,
-                isDub = false
-            ),
-            StreamSource(
-                serverName = "HD-2 Sub (HiAnime)",
-                provider = AnimeSource.HIANIME,
-                streamUrl = "https://hianime.to/watch/$hianimeSlug?ep=$epNum",
-                quality = "720p",
                 isEmbed = true,
                 isDub = false
             ),
@@ -89,7 +95,7 @@ object AnimeEpisodeCatalog {
                 isDub = true
             ),
             StreamSource(
-                serverName = "Fast Server (HiAnime)",
+                serverName = "MegaCloud (Fast Mirror)",
                 provider = AnimeSource.HIANIME,
                 streamUrl = "https://megacloud.blog/embed-2/e-1/$hianimeSlug?ep=$epNum",
                 quality = "Auto",
@@ -457,44 +463,43 @@ object AnimeEpisodeCatalog {
     // ATTACK ON TITAN (SEASON 1 - 25 EPISODES)
     // ==========================================
     private fun getAttackOnTitanEpisodes(cleanSlug: String): List<Episode> {
-        val titles = listOf(
-            "To You, in 2000 Years: The Fall of Shiganshina, Part 1",
-            "That Day: The Fall of Shiganshina, Part 2",
-            "A Dim Light Amid Despair: Humanity's Comeback, Part 1",
-            "The Night of the Closing Ceremony: Humanity's Comeback, Part 2",
-            "First Battle: The Struggle for Trost, Part 1",
-            "The World the Girl Saw: The Struggle for Trost, Part 2",
-            "Small Blade: The Struggle for Trost, Part 3",
-            "I Can Hear His Heartbeat: The Struggle for Trost, Part 4",
-            "Whereabouts of His Left Arm: The Struggle for Trost, Part 5",
-            "Response: The Struggle for Trost, Part 6",
-            "Idol: The Struggle for Trost, Part 7",
-            "Wound: The Struggle for Trost, Part 8",
-            "Primal Desire: The Struggle for Trost, Part 9",
-            "Can't Look into His Eyes Yet: Eve of the Counterattack, Part 1",
-            "Special Operations Squad: Eve of the Counterattack, Part 2",
-            "What Should Be Done: Eve of the Counterattack, Part 3",
-            "Female Titan: The 57th Exterior Scouting Mission, Part 1",
-            "Forest of Giant Trees: The 57th Exterior Scouting Mission, Part 2",
-            "Bite: The 57th Exterior Scouting Mission, Part 3",
-            "Erwin Smith: The 57th Exterior Scouting Mission, Part 4",
-            "Crushing Blow: The 57th Exterior Scouting Mission, Part 5",
-            "The Defeated: The 57th Exterior Scouting Mission, Part 6",
-            "Smile: Raid on Stohess District, Part 1",
-            "Mercy: Raid on Stohess District, Part 2",
-            "Wall: Raid on Stohess District, Part 3"
+        val episodeEntries = listOf(
+            Triple(1, "To You, in 2,000 Years: The Fall of Shiganshina, Part 1", "https://media.kitsu.app/episodes/thumbnails/104938/original.jpg"),
+            Triple(2, "That Day: The Fall of Shiganshina, Part 2", "https://media.kitsu.app/episodes/thumbnails/104939/original.jpg"),
+            Triple(3, "A Dim Light Amid Despair: Humanity's Comeback, Part 1", "https://media.kitsu.app/episodes/thumbnails/104940/original.jpeg"),
+            Triple(4, "The Night of the Closing Ceremony: Humanity's Comeback, Part 2", "https://media.kitsu.app/episodes/thumbnails/104941/original.jpeg"),
+            Triple(5, "First Battle: The Struggle for Trost, Part 1", "https://media.kitsu.app/episodes/thumbnails/104942/original.jpeg"),
+            Triple(6, "The World the Girl Saw: The Struggle for Trost, Part 2", "https://media.kitsu.app/episodes/thumbnails/104943/original.jpeg"),
+            Triple(7, "Small Blade: The Struggle for Trost, Part 3", "https://media.kitsu.app/episodes/thumbnails/104944/original.jpeg"),
+            Triple(8, "I Can Hear His Heartbeat: The Struggle for Trost, Part 4", "https://media.kitsu.app/episodes/thumbnails/104945/original.jpeg"),
+            Triple(9, "Whereabouts of His Left Arm: The Struggle for Trost, Part 5", "https://media.kitsu.app/episodes/thumbnails/104946/original.jpeg"),
+            Triple(10, "Response: The Struggle for Trost, Part 6", "https://media.kitsu.app/episodes/thumbnails/104947/original.jpeg"),
+            Triple(11, "Idol: The Struggle for Trost, Part 7", "https://media.kitsu.app/episodes/thumbnails/104948/original.jpeg"),
+            Triple(12, "Wound: The Struggle for Trost, Part 8", "https://media.kitsu.app/episodes/thumbnails/104949/original.jpeg"),
+            Triple(13, "Primal Desire: The Struggle for Trost, Part 9", "https://media.kitsu.app/episodes/thumbnails/104950/original.jpeg"),
+            Triple(14, "Can't Look into His Eyes Yet: Eve of the Counterattack, Part 1", "https://media.kitsu.app/episodes/thumbnails/104951/original.jpeg"),
+            Triple(15, "Special Operations Squad: Eve of the Counterattack, Part 2", "https://media.kitsu.app/episodes/thumbnails/104952/original.jpeg"),
+            Triple(16, "What Should Be Done: Eve of the Counterattack, Part 3", "https://media.kitsu.app/episodes/thumbnails/104953/original.jpeg"),
+            Triple(17, "Female Titan: The 57th Exterior Scouting Mission, Part 1", "https://media.kitsu.app/episodes/thumbnails/104954/original.jpeg"),
+            Triple(18, "Forest of Giant Trees: The 57th Exterior Scouting Mission, Part 2", "https://media.kitsu.app/episodes/thumbnails/104955/original.jpeg"),
+            Triple(19, "Bite: The 57th Exterior Scouting Mission, Part 3", "https://media.kitsu.app/episodes/thumbnails/104956/original.jpeg"),
+            Triple(20, "Erwin Smith: The 57th Exterior Scouting Mission, Part 4", "https://media.kitsu.app/episodes/thumbnails/104957/original.jpeg"),
+            Triple(21, "Crushing Blow: The 57th Exterior Scouting Mission, Part 5", "https://media.kitsu.app/episodes/thumbnails/104958/original.jpeg"),
+            Triple(22, "The Defeated: The 57th Exterior Scouting Mission, Part 6", "https://media.kitsu.app/episodes/thumbnails/104959/original.jpeg"),
+            Triple(23, "Smile: Raid on Stohess District, Part 1", "https://media.kitsu.app/episodes/thumbnails/104960/original.jpeg"),
+            Triple(24, "Mercy: Raid on Stohess District, Part 2", "https://media.kitsu.app/episodes/thumbnails/104961/original.jpeg"),
+            Triple(25, "Wall: Raid on Stohess District, Part 3", "https://media.kitsu.app/episodes/thumbnails/104962/original.jpeg")
         )
 
-        return titles.mapIndexed { idx, title ->
-            val num = idx + 1
+        return episodeEntries.map { (num, title, thumb) ->
             Episode(
                 episodeNumber = num,
                 title = "Episode $num: $title",
-                thumbnail = "https://media.kitsu.app/anime/cover_images/7442/large.jpg",
-                duration = "24m",
-                releaseTime = if (num == 25) "Season 1 Finale" else "Sub & Dub Available",
+                thumbnail = thumb,
+                duration = if (num == 1) "25m" else "24m",
+                releaseTime = if (num == 25) "Season 1 Finale" else "Episode $num (Full)",
                 sources = buildSources(cleanSlug, num),
-                videoUrl = ANIME_SAKUGA_VIDEO_URL
+                videoUrl = getAttackOnTitanEpisodeVideo(num)
             )
         }
     }

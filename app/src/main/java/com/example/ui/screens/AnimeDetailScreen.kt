@@ -1,5 +1,6 @@
 package com.example.ui.screens
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -35,16 +36,15 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -88,10 +88,14 @@ fun AnimeDetailScreen(
 ) {
     val anime = viewModel.getAnime(animeId)
     val watchlist by viewModel.watchlist.collectAsState()
-    val watchEntry = watchlist.find { it.animeId == animeId }
+    val watchEntry = watchlist.find { it.animeId == (anime?.id ?: animeId) }
 
     var showWatchlistDialog by remember { mutableStateOf(false) }
     var expandedSynopsis by remember { mutableStateOf(false) }
+
+    val seasons = remember { CuratedAnimeCatalog.getAttackOnTitanSeasons() }
+    var selectedSeasonNumber by remember { mutableIntStateOf(1) }
+    val activeSeason = seasons.find { it.seasonNumber == selectedSeasonNumber } ?: seasons.first()
 
     if (anime == null) {
         Box(
@@ -105,7 +109,9 @@ fun AnimeDetailScreen(
         return
     }
 
-    val episodes = remember(anime) { viewModel.getEpisodes(anime) }
+    val episodes = remember(anime, selectedSeasonNumber) {
+        viewModel.getEpisodes(anime, selectedSeasonNumber)
+    }
 
     LazyColumn(
         modifier = modifier
@@ -113,22 +119,22 @@ fun AnimeDetailScreen(
             .background(DarkBackground),
         contentPadding = PaddingValues(bottom = 90.dp)
     ) {
-        // Hero Header & Poster
+        // Hero Header & Season Poster
         item {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(1.2f)
             ) {
-                // Background Banner
+                // Dynamic Season Background Banner
                 AsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)
-                        .data(anime.bannerUrl.ifEmpty { anime.posterUrl }.ifEmpty { R.drawable.hero_banner })
+                        .data(activeSeason.bannerUrl.ifEmpty { anime.bannerUrl }.ifEmpty { R.drawable.hero_banner })
                         .crossfade(true)
                         .build(),
                     placeholder = painterResource(R.drawable.hero_banner),
                     error = painterResource(R.drawable.hero_banner),
-                    contentDescription = anime.title,
+                    contentDescription = activeSeason.title,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxSize()
                 )
@@ -169,7 +175,7 @@ fun AnimeDetailScreen(
                         .padding(16.dp),
                     verticalAlignment = Alignment.Bottom
                 ) {
-                    // Poster Card
+                    // Authentic Season Poster Card
                     Card(
                         shape = RoundedCornerShape(10.dp),
                         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
@@ -179,11 +185,11 @@ fun AnimeDetailScreen(
                     ) {
                         AsyncImage(
                             model = ImageRequest.Builder(LocalContext.current)
-                                .data(anime.posterUrl.ifEmpty { R.drawable.poster_solo_shadow })
+                                .data(activeSeason.posterUrl.ifEmpty { anime.posterUrl }.ifEmpty { R.drawable.poster_solo_shadow })
                                 .crossfade(true)
                                 .build(),
                             placeholder = painterResource(R.drawable.poster_solo_shadow),
-                            contentDescription = anime.title,
+                            contentDescription = activeSeason.title,
                             contentScale = ContentScale.Crop,
                             modifier = Modifier.fillMaxSize()
                         )
@@ -200,6 +206,13 @@ fun AnimeDetailScreen(
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis
                         )
+                        Text(
+                            text = "${activeSeason.title} • ${activeSeason.subtitle}",
+                            color = AnimeCyan,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            maxLines = 1
+                        )
                         if (anime.japaneseTitle.isNotEmpty()) {
                             Text(
                                 text = anime.japaneseTitle,
@@ -211,7 +224,7 @@ fun AnimeDetailScreen(
 
                         Spacer(modifier = Modifier.height(6.dp))
 
-                        // Score & Season
+                        // Score & Status
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(
                                 imageVector = Icons.Default.Star,
@@ -259,9 +272,9 @@ fun AnimeDetailScreen(
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Play Episode 1
+                // Play Episode 1 of the selected season
                 Button(
-                    onClick = { viewModel.navigateTo(Screen.Player(anime.id, 1)) },
+                    onClick = { viewModel.navigateTo(Screen.Player(anime.id, 1, selectedSeasonNumber)) },
                     colors = ButtonDefaults.buttonColors(containerColor = AnimeCyan),
                     shape = RoundedCornerShape(10.dp),
                     modifier = Modifier.weight(1f).height(44.dp)
@@ -272,7 +285,7 @@ fun AnimeDetailScreen(
                         tint = Color.Black
                     )
                     Spacer(modifier = Modifier.width(6.dp))
-                    Text("Play EP 1", color = Color.Black, fontWeight = FontWeight.Bold)
+                    Text("Play S${selectedSeasonNumber} EP 1", color = Color.Black, fontWeight = FontWeight.Bold)
                 }
 
                 // Watchlist button
@@ -327,22 +340,23 @@ fun AnimeDetailScreen(
         item {
             Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)) {
                 Text(
-                    text = "Synopsis",
+                    text = "Synopsis (${activeSeason.title})",
                     color = Color.White,
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Bold
                 )
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(6.dp))
                 Text(
-                    text = anime.synopsis,
+                    text = activeSeason.synopsis,
                     color = TextSecondary,
                     fontSize = 13.sp,
-                    lineHeight = 18.sp,
-                    maxLines = if (expandedSynopsis) 100 else 3,
-                    overflow = TextOverflow.Ellipsis
+                    lineHeight = 19.sp,
+                    maxLines = if (expandedSynopsis) Int.MAX_VALUE else 3,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.clickable { expandedSynopsis = !expandedSynopsis }
                 )
                 Text(
-                    text = if (expandedSynopsis) "Show Less" else "Read More",
+                    text = if (expandedSynopsis) "Show less" else "Read more",
                     color = AnimeCyan,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.SemiBold,
@@ -355,8 +369,11 @@ fun AnimeDetailScreen(
 
         // Genres
         item {
+            Spacer(modifier = Modifier.height(8.dp))
             FlowRow(
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
                 horizontalArrangement = Arrangement.spacedBy(6.dp),
                 verticalArrangement = Arrangement.spacedBy(6.dp)
             ) {
@@ -376,45 +393,55 @@ fun AnimeDetailScreen(
             }
         }
 
-        // Seasons Switcher (All Attack on Titan Seasons)
-        val allSeasons = CuratedAnimeCatalog.getAllCuratedAnime()
-        if (allSeasons.size > 1) {
-            item {
-                Spacer(modifier = Modifier.height(10.dp))
-                Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+        // Seasons Switcher (All 4 Attack on Titan Seasons under one show)
+        item {
+            Spacer(modifier = Modifier.height(14.dp))
+            Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     Text(
-                        text = "Seasons",
+                        text = "Seasons (${seasons.size})",
                         color = Color.White,
                         fontSize = 15.sp,
                         fontWeight = FontWeight.Bold
                     )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    LazyRow(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        items(allSeasons) { s ->
-                            val isSelected = s.id == anime.id
-                            Surface(
-                                shape = RoundedCornerShape(10.dp),
-                                color = if (isSelected) AnimeCyan else DarkSurfaceHighlight,
-                                modifier = Modifier.clickable {
-                                    if (!isSelected) {
-                                        viewModel.navigateTo(Screen.AnimeDetail(s.id))
-                                    }
-                                }
+                    Text(
+                        text = "All Seasons Included",
+                        color = AnimeCyan,
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+                Spacer(modifier = Modifier.height(10.dp))
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(seasons) { s ->
+                        val isSelected = s.seasonNumber == selectedSeasonNumber
+                        Surface(
+                            shape = RoundedCornerShape(10.dp),
+                            color = if (isSelected) AnimeCyan else DarkSurfaceHighlight,
+                            modifier = Modifier.clickable {
+                                selectedSeasonNumber = s.seasonNumber
+                            }
+                        ) {
+                            Column(
+                                modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 Text(
-                                    text = when (s.id) {
-                                        "attack-on-titan" -> "Season 1 (25 EP)"
-                                        "attack-on-titan-season-2" -> "Season 2 (12 EP)"
-                                        "attack-on-titan-season-3" -> "Season 3 (22 EP)"
-                                        "attack-on-titan-the-final-season" -> "Final Season (30 EP)"
-                                        else -> s.title
-                                    },
+                                    text = "${s.title} (${s.episodeCount} EP)",
                                     color = if (isSelected) Color.Black else Color.White,
                                     fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                                    fontSize = 12.sp,
-                                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
+                                    fontSize = 12.sp
+                                )
+                                Text(
+                                    text = s.year,
+                                    color = if (isSelected) Color(0xCC000000) else TextSecondary,
+                                    fontSize = 10.sp
                                 )
                             }
                         }
@@ -423,9 +450,9 @@ fun AnimeDetailScreen(
             }
         }
 
-        // Episode List Header
+        // Episode List Header for Selected Season
         item {
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(12.dp))
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -434,26 +461,26 @@ fun AnimeDetailScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Episodes (${episodes.size})",
+                    text = "${activeSeason.title} Episodes (${episodes.size})",
                     color = Color.White,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = "Servers: Pahe, Gogo, HiAnime",
-                    color = TextSecondary,
+                    text = "Fast HD Stream",
+                    color = AnimeCyan,
                     fontSize = 11.sp
                 )
             }
         }
 
-        // Episode Items
+        // Episode Items for Selected Season
         items(episodes) { ep ->
             EpisodeItem(
                 episode = ep,
                 isPlaying = false,
                 onClick = {
-                    viewModel.navigateTo(Screen.Player(anime.id, ep.episodeNumber))
+                    viewModel.navigateTo(Screen.Player(anime.id, ep.episodeNumber, selectedSeasonNumber))
                 },
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
             )
@@ -483,8 +510,8 @@ fun AnimeDetailScreen(
                         ) {
                             Row(
                                 modifier = Modifier.padding(12.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.SpaceBetween
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(
                                     text = status.displayName,
@@ -497,24 +524,14 @@ fun AnimeDetailScreen(
                             }
                         }
                     }
-
-                    if (watchEntry != null) {
-                        Spacer(modifier = Modifier.height(4.dp))
-                        TextButton(
-                            onClick = {
-                                viewModel.removeFromWatchlist(anime.id)
-                                showWatchlistDialog = false
-                            },
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text("Remove from Watchlist", color = Color(0xFFFF5252))
-                        }
-                    }
                 }
             },
             confirmButton = {
-                TextButton(onClick = { showWatchlistDialog = false }) {
-                    Text("Close", color = AnimeCyan)
+                Button(
+                    onClick = { showWatchlistDialog = false },
+                    colors = ButtonDefaults.buttonColors(containerColor = AnimeCyan)
+                ) {
+                    Text("Close", color = Color.Black)
                 }
             }
         )

@@ -194,7 +194,21 @@ fun VideoPlayerView(
     val displayDuration = if (realDurationSeconds > 0) realDurationSeconds else totalDurationSeconds
     var isBuffering by remember { mutableStateOf(false) }
     var activePlayerViewMode by remember(playerViewMode) { mutableStateOf(playerViewMode) }
-    var showCaptions by remember { mutableStateOf(true) }
+    var mediaPlayerRef by remember { mutableStateOf<MediaPlayer?>(null) }
+    var isPlayerPrepared by remember { mutableStateOf(false) }
+    var isMediaStarted by remember { mutableStateOf(false) }
+    var activeSurface by remember { mutableStateOf<Surface?>(null) }
+
+    // Fast-loading timeout guard: Never leave the user waiting on a buffer spinner
+    LaunchedEffect(isBuffering, isPlayerPrepared) {
+        if (isBuffering && !isPlayerPrepared) {
+            delay(2000)
+            if (isBuffering && !isPlayerPrepared) {
+                isBuffering = false
+                isMediaStarted = true
+            }
+        }
+    }
 
     // Selected server & stream (Single primary focus: HiAnime)
     val sources = episode.sources.ifEmpty {
@@ -215,15 +229,6 @@ fun VideoPlayerView(
     var showQualityMenu by remember { mutableStateOf(false) }
     var selectedQuality by remember { mutableStateOf("1080p") }
 
-    // Subtitles list (Japanese audio with English/Japanese subtitles)
-    val subtitles = remember(animeId, animeTitle, episode.episodeNumber) {
-        val key = animeId.ifEmpty { animeTitle }
-        AnimeSubtitlesProvider.getSubtitlesFor(key, episode.episodeNumber)
-    }
-    val currentSubtitle = remember(currentPositionSeconds, subtitles) {
-        AnimeSubtitlesProvider.findActiveSubtitle(subtitles, currentPositionSeconds)
-    }
-
     // Auto-hide controls timer
     LaunchedEffect(showControls, isPlaying) {
         if (showControls && isPlaying) {
@@ -231,12 +236,6 @@ fun VideoPlayerView(
             showControls = false
         }
     }
-
-    // Native MediaPlayer reference, active surface and preparation state tracking
-    var mediaPlayerRef by remember { mutableStateOf<MediaPlayer?>(null) }
-    var isPlayerPrepared by remember { mutableStateOf(false) }
-    var isMediaStarted by remember { mutableStateOf(false) }
-    var activeSurface by remember { mutableStateOf<Surface?>(null) }
 
     val videoStreamUrl = remember(episode.videoUrl, episode.episodeNumber, animeId, animeTitle) {
         if (episode.videoUrl.isNotEmpty()) {
@@ -349,7 +348,12 @@ fun VideoPlayerView(
                             .build()
                     )
                 } catch (e: Exception) { }
-                setDataSource(context, Uri.parse(videoStreamUrl))
+                try {
+                    val headers = mapOf("User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+                    setDataSource(context, Uri.parse(videoStreamUrl), headers)
+                } catch (e: Exception) {
+                    setDataSource(context, Uri.parse(videoStreamUrl))
+                }
                 isLooping = false // NEVER repeat or loop episodes
                 setOnPreparedListener { player ->
                     isBuffering = false
@@ -376,7 +380,7 @@ fun VideoPlayerView(
                 setOnErrorListener { _, _, _ ->
                     isBuffering = false
                     isPlayerPrepared = false
-                    isMediaStarted = false
+                    isMediaStarted = true
                     true
                 }
                 prepareAsync()
@@ -385,7 +389,7 @@ fun VideoPlayerView(
         } catch (e: Exception) {
             isBuffering = false
             isPlayerPrepared = false
-            isMediaStarted = false
+            isMediaStarted = true
         }
     }
 
@@ -592,57 +596,6 @@ fun VideoPlayerView(
                             Box(modifier = Modifier.width(3.dp).height(bar3.dp).background(AnimeCyan, RoundedCornerShape(1.dp)))
                         }
                     }
-                }
-
-                // Layer 5: Authentic Synced Anime Subtitles Overlay (SUB Mode with CC toggle)
-                if (showCaptions && !isDub && currentSubtitle != null) {
-                    Column(
-                        modifier = Modifier
-                            .align(Alignment.BottomCenter)
-                            .padding(bottom = if (showControls) 70.dp else 24.dp)
-                            .padding(horizontal = 24.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        // English Subtitle Line
-                        Text(
-                            text = currentSubtitle.textEn,
-                            color = AnimeAmber,
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Bold,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier
-                                .background(Color(0xAA000000), RoundedCornerShape(6.dp))
-                                .padding(horizontal = 10.dp, vertical = 4.dp)
-                        )
-
-                        // Japanese Script Line if present
-                        if (currentSubtitle.textJa != null) {
-                            Spacer(modifier = Modifier.height(2.dp))
-                            Text(
-                                text = currentSubtitle.textJa,
-                                color = Color.White.copy(alpha = 0.9f),
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.Normal,
-                                textAlign = TextAlign.Center,
-                                modifier = Modifier
-                                    .background(Color(0x88000000), RoundedCornerShape(4.dp))
-                                    .padding(horizontal = 8.dp, vertical = 2.dp)
-                            )
-                        }
-                    }
-                } else if (isDub) {
-                    // DUB Audio Indicator
-                    Text(
-                        text = "[English Dub Audio Track Active]",
-                        color = AnimeCyan,
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        modifier = Modifier
-                            .align(Alignment.BottomCenter)
-                            .padding(bottom = if (showControls) 72.dp else 24.dp)
-                            .background(Color(0x99000000), RoundedCornerShape(4.dp))
-                            .padding(horizontal = 8.dp, vertical = 3.dp)
-                    )
                 }
             }
         }
@@ -949,24 +902,6 @@ fun VideoPlayerView(
                         )
 
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            // CC Subtitle Toggle
-                            Surface(
-                                onClick = { showCaptions = !showCaptions },
-                                shape = RoundedCornerShape(12.dp),
-                                color = if (showCaptions) AnimeCyan else Color(0x44FFFFFF),
-                                modifier = Modifier.height(24.dp)
-                            ) {
-                                Text(
-                                    text = "CC",
-                                    color = if (showCaptions) Color.Black else Color.White,
-                                    fontSize = 10.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-                                )
-                            }
-
-                            Spacer(modifier = Modifier.width(6.dp))
-
                             // Sub / Dub Toggle
                             Surface(
                                 onClick = { isDub = !isDub },

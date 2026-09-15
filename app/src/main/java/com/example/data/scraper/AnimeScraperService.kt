@@ -329,7 +329,23 @@ class AnimeScraperService {
     /**
      * Generate episode list with multi-source server aggregations and authentic metadata
      */
+    fun getEpisodesForAnimeAndSeason(anime: Anime, seasonNumber: Int = 1): List<Episode> {
+        if (anime.id.startsWith("attack-on-titan")) {
+            return when (seasonNumber) {
+                1 -> AnimeEpisodeCatalog.getAttackOnTitanEpisodes("attack-on-titan")
+                2 -> AnimeEpisodeCatalog.getAttackOnTitanSeason2Episodes("attack-on-titan-season-2")
+                3 -> AnimeEpisodeCatalog.getAttackOnTitanSeason3Episodes("attack-on-titan-season-3")
+                4 -> AnimeEpisodeCatalog.getAttackOnTitanFinalSeasonEpisodes("attack-on-titan-the-final-season")
+                else -> AnimeEpisodeCatalog.getAttackOnTitanEpisodes("attack-on-titan")
+            }
+        }
+        return getEpisodesForAnime(anime)
+    }
+
     fun getEpisodesForAnime(anime: Anime): List<Episode> {
+        if (anime.id.startsWith("attack-on-titan")) {
+            return getEpisodesForAnimeAndSeason(anime, 1)
+        }
         val cleanSlug = anime.title.lowercase()
             .replace(Regex("[^a-z0-9]+"), "-")
             .trim('-')

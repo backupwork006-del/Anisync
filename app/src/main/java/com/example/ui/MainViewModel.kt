@@ -28,7 +28,7 @@ sealed class Screen {
     object Notifications : Screen()
     object Settings : Screen()
     data class AnimeDetail(val animeId: String) : Screen()
-    data class Player(val animeId: String, val episodeNumber: Int) : Screen()
+    data class Player(val animeId: String, val episodeNumber: Int, val seasonNumber: Int = 1) : Screen()
 }
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
@@ -163,8 +163,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         return animeRepository.getAnimeById(id)
     }
 
-    fun getEpisodes(anime: Anime): List<Episode> {
-        return animeRepository.getEpisodes(anime)
+    fun getEpisodes(anime: Anime, seasonNumber: Int = 1): List<Episode> {
+        return animeRepository.getEpisodes(anime, seasonNumber)
     }
 
     // Watchlist Operations

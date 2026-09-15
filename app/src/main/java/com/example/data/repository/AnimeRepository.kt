@@ -48,11 +48,14 @@ class AnimeRepository(
     }
 
     fun getAnimeById(id: String): Anime? {
+        if (id.startsWith("attack-on-titan")) {
+            return CuratedAnimeCatalog.getAllCuratedAnime().first()
+        }
         return inMemoryCache[id] ?: CuratedAnimeCatalog.getAllCuratedAnime().find { it.id == id }
     }
 
-    fun getEpisodes(anime: Anime): List<Episode> {
-        return scraperService.getEpisodesForAnime(anime)
+    fun getEpisodes(anime: Anime, seasonNumber: Int = 1): List<Episode> {
+        return scraperService.getEpisodesForAnimeAndSeason(anime, seasonNumber)
     }
 
     /**

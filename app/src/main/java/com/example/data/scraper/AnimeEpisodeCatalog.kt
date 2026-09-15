@@ -492,7 +492,7 @@ object AnimeEpisodeCatalog {
     // ==========================================
     // ATTACK ON TITAN (SEASON 1 - 25 EPISODES)
     // ==========================================
-    private fun getAttackOnTitanEpisodes(cleanSlug: String): List<Episode> {
+    fun getAttackOnTitanEpisodes(cleanSlug: String): List<Episode> {
         val episodeEntries = listOf(
             Triple(1, "To You, in 2,000 Years: The Fall of Shiganshina, Part 1", "https://media.kitsu.app/episodes/thumbnails/104938/original.jpg"),
             Triple(2, "That Day: The Fall of Shiganshina, Part 2", "https://media.kitsu.app/episodes/thumbnails/104939/original.jpg"),
@@ -537,7 +537,7 @@ object AnimeEpisodeCatalog {
     // ==========================================
     // ATTACK ON TITAN (SEASON 2 - 12 EPISODES)
     // ==========================================
-    private fun getAttackOnTitanSeason2Episodes(cleanSlug: String): List<Episode> {
+    fun getAttackOnTitanSeason2Episodes(cleanSlug: String): List<Episode> {
         val s2Titles = listOf(
             "Beast Titan",
             "I'm Home",
@@ -584,7 +584,7 @@ object AnimeEpisodeCatalog {
     // ==========================================
     // ATTACK ON TITAN (SEASON 3 - 22 EPISODES)
     // ==========================================
-    private fun getAttackOnTitanSeason3Episodes(cleanSlug: String): List<Episode> {
+    fun getAttackOnTitanSeason3Episodes(cleanSlug: String): List<Episode> {
         val s3Titles = listOf(
             "Smoke Signal",
             "Pain",
@@ -651,7 +651,7 @@ object AnimeEpisodeCatalog {
     // ==========================================
     // ATTACK ON TITAN (THE FINAL SEASON - 30 EPISODES)
     // ==========================================
-    private fun getAttackOnTitanFinalSeasonEpisodes(cleanSlug: String): List<Episode> {
+    fun getAttackOnTitanFinalSeasonEpisodes(cleanSlug: String): List<Episode> {
         val s4Titles = listOf(
             "The Other Side of the Sea",
             "Midnight Train",

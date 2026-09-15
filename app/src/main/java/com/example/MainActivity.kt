@@ -236,6 +236,7 @@ fun AnimeStreamApp(viewModel: MainViewModel) {
                     is Screen.Player -> PlayerScreen(
                         animeId = screen.animeId,
                         initialEpisodeNumber = screen.episodeNumber,
+                        initialSeasonNumber = screen.seasonNumber,
                         viewModel = viewModel
                     )
                 }

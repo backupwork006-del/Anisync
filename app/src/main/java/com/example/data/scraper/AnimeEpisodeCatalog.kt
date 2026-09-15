@@ -31,7 +31,7 @@ object AnimeEpisodeCatalog {
         val ep = episodeNumber.coerceIn(1, 25)
         return when (quality) {
             "360p", "480p" -> "https://archive.org/download/shingeki-no-kyojin-episode-1/shingeki-no-kyojin-episode-$ep.mp4"
-            else -> "https://archive.org/download/shingeki-no-kyojin_aot/season-1_DUB-1080p/Attack_on_Titan-E$ep-1080p.mp4"
+            else -> "https://archive.org/download/shingeki-no-kyojin_aot/season-1_DUB-1080p/Attack_on_Titan-E$ep-1080p.ia.mp4"
         }
     }
 
@@ -39,15 +39,15 @@ object AnimeEpisodeCatalog {
         val ep = episodeNumber.coerceIn(1, 12)
         return when (quality) {
             "360p", "480p" -> "https://archive.org/download/shingeki-no-kyojin-episode-1/shingeki-no-kyojin-episode-$ep.mp4"
-            else -> "https://archive.org/download/shingeki-no-kyojin_aot/season-2_DUB-1080p/Attack_on_Titan_Season_2-E$ep-1080p.mp4"
+            else -> "https://archive.org/download/shingeki-no-kyojin_aot/season-2_DUB-1080p/Attack_on_Titan_Season_2-E$ep-1080p.ia.mp4"
         }
     }
 
     fun getAttackOnTitanSeason3Video(episodeNumber: Int, quality: String = "1080p"): String {
-        val ep = episodeNumber.coerceIn(1, 22)
+        val ep = episodeNumber.coerceIn(1, 15)
         return when (quality) {
             "360p", "480p" -> "https://archive.org/download/shingeki-no-kyojin-episode-1/shingeki-no-kyojin-episode-$ep.mp4"
-            else -> "https://archive.org/download/shingeki-no-kyojin_aot/season-3_DUB-1080p/Attack_on_Titan_Season_3-E$ep-1080p.mp4"
+            else -> "https://archive.org/download/shingeki-no-kyojin_aot/season-3_DUB-1080p/Attack_on_Titan_Season_3-E$ep-1080p.ia.mp4"
         }
     }
 
@@ -55,7 +55,7 @@ object AnimeEpisodeCatalog {
         val mappedEp = ((episodeNumber - 1) % 16) + 1
         return when (quality) {
             "360p", "480p" -> "https://archive.org/download/shingeki-no-kyojin-episode-1/shingeki-no-kyojin-episode-$mappedEp.mp4"
-            else -> "https://archive.org/download/shingeki-no-kyojin_aot/season-finale-pt-1_DUB-1080p/Attack_on_Titan_Final_Season,_Part_1-E$mappedEp-1080p.mp4"
+            else -> "https://archive.org/download/shingeki-no-kyojin_aot/season-finale-pt-1_DUB-1080p/Attack_on_Titan_Final_Season,_Part_1-E$mappedEp-1080p.ia.mp4"
         }
     }
 

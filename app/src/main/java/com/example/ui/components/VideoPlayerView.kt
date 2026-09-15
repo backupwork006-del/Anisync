@@ -102,7 +102,12 @@ import com.example.ui.theme.AnimeCyan
 import com.example.ui.theme.AnimePink
 import com.example.ui.theme.DarkSurface
 import com.example.ui.theme.SuccessGreen
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import java.time.Duration
 
 enum class PlayerViewMode {
     STREAM_PLAYER,
@@ -192,23 +197,14 @@ fun VideoPlayerView(
     var realDurationSeconds by remember { mutableIntStateOf(0) }
     val totalDurationSeconds = remember { 24 * 60 } // Standard 24-minute fallback
     val displayDuration = if (realDurationSeconds > 0) realDurationSeconds else totalDurationSeconds
-    var isBuffering by remember { mutableStateOf(false) }
+    var isBuffering by remember { mutableStateOf(true) }
     var activePlayerViewMode by remember(playerViewMode) { mutableStateOf(playerViewMode) }
     var mediaPlayerRef by remember { mutableStateOf<MediaPlayer?>(null) }
     var isPlayerPrepared by remember { mutableStateOf(false) }
     var isMediaStarted by remember { mutableStateOf(false) }
     var activeSurface by remember { mutableStateOf<Surface?>(null) }
-
-    // Fast-loading timeout guard: Never leave the user waiting on a buffer spinner
-    LaunchedEffect(isBuffering, isPlayerPrepared) {
-        if (isBuffering && !isPlayerPrepared) {
-            delay(2000)
-            if (isBuffering && !isPlayerPrepared) {
-                isBuffering = false
-                isMediaStarted = true
-            }
-        }
-    }
+    var hasPlaybackError by remember { mutableStateOf(false) }
+    var retryTrigger by remember { mutableIntStateOf(0) }
 
     // Selected server & stream (Single primary focus: HiAnime)
     val sources = episode.sources.ifEmpty {
@@ -238,65 +234,34 @@ fun VideoPlayerView(
     }
 
     val videoStreamUrl = remember(episode.videoUrl, episode.episodeNumber, animeId, animeTitle, selectedQuality, currentSource) {
-        val key = animeId.ifEmpty { animeTitle }
-        AnimeEpisodeCatalog.getAnimeVideoUrl(key, episode.episodeNumber, selectedQuality)
-    }
-
-    // Playback progress ticker & synchronized MediaPlayer tracking (NEVER loop, sync position accurately)
-    LaunchedEffect(isPlaying, isPlayerPrepared, isMediaStarted, selectedSpeed) {
-        while (isPlaying) {
-            delay(500)
-            if (isPlayerPrepared && isMediaStarted) {
-                try {
-                    mediaPlayerRef?.let { mp ->
-                        if (mp.isPlaying) {
-                            val pos = mp.currentPosition / 1000
-                            currentPositionSeconds = pos
-                            val dur = if (realDurationSeconds > 0) realDurationSeconds else displayDuration
-                            if (dur > 0) {
-                                onProgressUpdate?.invoke((pos.toFloat() / dur.toFloat()).coerceIn(0f, 1f))
-                            }
-                        }
-                    }
-                } catch (e: Exception) { }
-            } else {
-                if (currentPositionSeconds < displayDuration) {
-                    currentPositionSeconds += 1
-                }
-            }
+        if (!currentSource.isEmbed && currentSource.streamUrl.startsWith("http")) {
+            currentSource.streamUrl
+        } else {
+            val key = animeId.ifEmpty { animeTitle }
+            AnimeEpisodeCatalog.getAnimeVideoUrl(key, episode.episodeNumber, selectedQuality)
         }
     }
 
-    // Gentle Ken Burns zoom animation for anime scene
-    val infiniteTransition = rememberInfiniteTransition(label = "ken_burns")
-    val sceneScale by infiniteTransition.animateFloat(
-        initialValue = 1.0f,
-        targetValue = 1.08f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(12000, easing = FastOutSlowInEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "scene_zoom"
-    )
+    // Playback progress ticker - strictly tracks real MediaPlayer progress when actually playing
+    LaunchedEffect(isPlaying, isPlayerPrepared, isMediaStarted, selectedSpeed) {
+        while (isPlaying && isPlayerPrepared && isMediaStarted) {
+            delay(500)
+            try {
+                mediaPlayerRef?.let { mp ->
+                    if (mp.isPlaying) {
+                        val pos = mp.currentPosition / 1000
+                        currentPositionSeconds = pos
+                        val dur = if (realDurationSeconds > 0) realDurationSeconds else displayDuration
+                        if (dur > 0) {
+                            onProgressUpdate?.invoke((pos.toFloat() / dur.toFloat()).coerceIn(0f, 1f))
+                        }
+                    }
+                }
+            } catch (e: Exception) { }
+        }
+    }
 
-    // Visualizer equalizer bar height animations
-    val bar1 by infiniteTransition.animateFloat(
-        initialValue = 4f, targetValue = 16f,
-        animationSpec = infiniteRepeatable(tween(350, easing = FastOutSlowInEasing), RepeatMode.Reverse),
-        label = "eq1"
-    )
-    val bar2 by infiniteTransition.animateFloat(
-        initialValue = 14f, targetValue = 6f,
-        animationSpec = infiniteRepeatable(tween(420, easing = FastOutSlowInEasing), RepeatMode.Reverse),
-        label = "eq2"
-    )
-    val bar3 by infiniteTransition.animateFloat(
-        initialValue = 6f, targetValue = 18f,
-        animationSpec = infiniteRepeatable(tween(380, easing = FastOutSlowInEasing), RepeatMode.Reverse),
-        label = "eq3"
-    )
-
-    val imageModel = episode.thumbnail.ifEmpty { backdropUrl }.ifEmpty { R.drawable.hero_banner }
+    val imageModel = episode.thumbnail.ifEmpty { backdropUrl }
 
     // Safe seek function to prevent calling seekTo when uninitialized
     val seekToTime: (Int) -> Unit = remember(displayDuration, isPlayerPrepared) {
@@ -313,10 +278,11 @@ fun VideoPlayerView(
         }
     }
 
-    // Orchestrate MediaPlayer loading and preparation whenever video stream or surface changes
-    LaunchedEffect(videoStreamUrl, activeSurface) {
+    // Orchestrate MediaPlayer loading and preparation whenever video stream, surface, or retry changes
+    LaunchedEffect(videoStreamUrl, activeSurface, retryTrigger) {
         val resumePos = currentPositionSeconds
         realDurationSeconds = 0
+        hasPlaybackError = false
         val surface = activeSurface ?: return@LaunchedEffect
         try {
             isPlayerPrepared = false
@@ -324,15 +290,31 @@ fun VideoPlayerView(
             isBuffering = true
             try {
                 mediaPlayerRef?.run {
-                    try {
-                        reset()
-                    } catch (e: Exception) { }
-                    try {
-                        release()
-                    } catch (e: Exception) { }
+                    try { reset() } catch (e: Exception) { }
+                    try { release() } catch (e: Exception) { }
                 }
             } catch (e: Exception) { }
             mediaPlayerRef = null
+
+            // Resolve direct CDN url in background to bypass 302 redirects smoothly and prevent stalls
+            val targetUrl = withContext(Dispatchers.IO) {
+                try {
+                    val client = OkHttpClient.Builder()
+                        .followRedirects(true)
+                        .followSslRedirects(true)
+                        .callTimeout(Duration.ofSeconds(6))
+                        .build()
+                    val req = Request.Builder()
+                        .url(videoStreamUrl)
+                        .head()
+                        .build()
+                    client.newCall(req).execute().use { resp ->
+                        resp.request.url.toString()
+                    }
+                } catch (e: Exception) {
+                    videoStreamUrl
+                }
+            }
 
             val mp = MediaPlayer().apply {
                 setSurface(surface)
@@ -345,16 +327,16 @@ fun VideoPlayerView(
                     )
                 } catch (e: Exception) { }
                 try {
-                    val headers = mapOf("User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
-                    setDataSource(context, Uri.parse(videoStreamUrl), headers)
+                    setDataSource(context, Uri.parse(targetUrl))
                 } catch (e: Exception) {
-                    setDataSource(context, Uri.parse(videoStreamUrl))
+                    setDataSource(targetUrl)
                 }
                 setVideoScalingMode(MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT)
                 isLooping = false // NEVER repeat or loop episodes
                 setOnPreparedListener { player ->
                     isBuffering = false
                     isPlayerPrepared = true
+                    hasPlaybackError = false
                     val durSec = player.duration / 1000
                     if (durSec > 0) {
                         realDurationSeconds = durSec
@@ -379,19 +361,23 @@ fun VideoPlayerView(
                     onProgressUpdate?.invoke(1.0f)
                     onNextEpisode?.invoke()
                 }
-                setOnErrorListener { _, _, _ ->
+                setOnErrorListener { _, what, extra ->
+                    android.util.Log.e("VideoPlayer", "MediaPlayer playback error: what=$what, extra=$extra")
                     isBuffering = false
                     isPlayerPrepared = false
-                    isMediaStarted = true
+                    isMediaStarted = false
+                    hasPlaybackError = true
                     true
                 }
                 prepareAsync()
             }
             mediaPlayerRef = mp
         } catch (e: Exception) {
+            android.util.Log.e("VideoPlayer", "MediaPlayer init error: ${e.message}")
             isBuffering = false
             isPlayerPrepared = false
-            isMediaStarted = true
+            isMediaStarted = false
+            hasPlaybackError = true
         }
     }
 
@@ -502,24 +488,26 @@ fun VideoPlayerView(
                 modifier = Modifier.fillMaxSize()
             )
         } else {
-            // STREAM PLAYER MODE: Multi-Layer Video & Animated Anime Scene (Never Blank!)
-            Box(modifier = Modifier.fillMaxSize()) {
-                // Layer 1: Authentic High-Res Anime Backdrop with Ken Burns Motion
-                AsyncImage(
-                    model = ImageRequest.Builder(context)
-                        .data(imageModel)
-                        .crossfade(true)
-                        .build(),
-                    placeholder = painterResource(R.drawable.hero_banner),
-                    error = painterResource(R.drawable.hero_banner),
-                    contentDescription = animeTitle,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .scale(if (isPlaying) sceneScale else 1.0f)
-                )
+            // STREAM PLAYER MODE: Native Hardware-Accelerated Video Layer
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black)
+            ) {
+                // Pre-play Poster: only displayed before stream is prepared and if an actual episode/anime thumbnail exists
+                if (!isPlayerPrepared && imageModel.isNotBlank()) {
+                    AsyncImage(
+                        model = ImageRequest.Builder(context)
+                            .data(imageModel)
+                            .crossfade(true)
+                            .build(),
+                        contentDescription = animeTitle,
+                        contentScale = ContentScale.Fit,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
 
-                // Layer 2: TextureView Native Hardware-Accelerated Video Layer
+                // TextureView Native Hardware-Accelerated Video Layer
                 AndroidView(
                     factory = { ctx ->
                         TextureView(ctx).apply {
@@ -551,49 +539,103 @@ fun VideoPlayerView(
                         }
                     },
                     update = {
-                        // Playback is safely orchestrated via LaunchedEffect(isPlaying, isPlayerPrepared)
+                        // Managed cleanly via MediaPlayer lifecycle
                     },
                     modifier = Modifier.fillMaxSize()
                 )
 
-                // Visualizer Equalizer Badge (Shows when controls are visible)
-                if (isPlaying && showControls) {
-                    Row(
+                // Error overlay if video playback or stream fails
+                if (hasPlaybackError) {
+                    Column(
                         modifier = Modifier
-                            .align(Alignment.TopEnd)
-                            .padding(top = 10.dp, end = 12.dp)
-                            .background(Color(0x88000000), RoundedCornerShape(12.dp))
-                            .padding(horizontal = 8.dp, vertical = 4.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                            .fillMaxSize()
+                            .background(Color(0xEE0D1117))
+                            .padding(20.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
                     ) {
                         Icon(
-                            imageVector = Icons.Default.VolumeUp,
-                            contentDescription = "Audio Stream",
-                            tint = AnimeCyan,
-                            modifier = Modifier.size(12.dp)
+                            imageVector = Icons.Default.LiveTv,
+                            contentDescription = "Stream issue",
+                            tint = AnimePink,
+                            modifier = Modifier.size(42.dp)
                         )
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Row(
-                            verticalAlignment = Alignment.Bottom,
-                            horizontalArrangement = Arrangement.spacedBy(2.dp),
-                            modifier = Modifier.height(14.dp)
-                        ) {
-                            Box(modifier = Modifier.width(3.dp).height(bar1.dp).background(AnimeCyan, RoundedCornerShape(1.dp)))
-                            Box(modifier = Modifier.width(3.dp).height(bar2.dp).background(AnimePink, RoundedCornerShape(1.dp)))
-                            Box(modifier = Modifier.width(3.dp).height(bar3.dp).background(AnimeCyan, RoundedCornerShape(1.dp)))
+                        Spacer(modifier = Modifier.height(10.dp))
+                        Text(
+                            text = "Stream Connection Issue",
+                            color = Color.White,
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Spacer(modifier = Modifier.height(6.dp))
+                        Text(
+                            text = "Unable to stream $selectedQuality directly. Try 360p Data Saver or switch server.",
+                            color = Color.LightGray,
+                            fontSize = 12.sp,
+                            textAlign = TextAlign.Center
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                            Surface(
+                                onClick = {
+                                    selectedQuality = "360p"
+                                    hasPlaybackError = false
+                                    isBuffering = true
+                                    retryTrigger++
+                                },
+                                shape = RoundedCornerShape(16.dp),
+                                color = AnimeCyan
+                            ) {
+                                Text(
+                                    text = "Try 360p Stream",
+                                    color = Color.Black,
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp)
+                                )
+                            }
+                            Surface(
+                                onClick = {
+                                    hasPlaybackError = false
+                                    isBuffering = true
+                                    retryTrigger++
+                                },
+                                shape = RoundedCornerShape(16.dp),
+                                color = Color(0x55FFFFFF)
+                            ) {
+                                Text(
+                                    text = "Retry",
+                                    color = Color.White,
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp)
+                                )
+                            }
                         }
                     }
                 }
             }
         }
 
-        // Loading spinner if buffering
-        if (isBuffering) {
-            CircularProgressIndicator(
-                color = AnimeCyan,
-                strokeWidth = 3.dp,
-                modifier = Modifier.size(36.dp).align(Alignment.Center)
-            )
+        // Loading spinner if buffering and no error
+        if (isBuffering && !hasPlaybackError) {
+            Column(
+                modifier = Modifier.align(Alignment.Center),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                CircularProgressIndicator(
+                    color = AnimeCyan,
+                    strokeWidth = 3.dp,
+                    modifier = Modifier.size(36.dp)
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Loading stream...",
+                    color = Color.White,
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Medium
+                )
+            }
         }
 
         // Overlay Controls HUD

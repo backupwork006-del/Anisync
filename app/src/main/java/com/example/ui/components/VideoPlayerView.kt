@@ -237,13 +237,9 @@ fun VideoPlayerView(
         }
     }
 
-    val videoStreamUrl = remember(episode.videoUrl, episode.episodeNumber, animeId, animeTitle) {
-        if (episode.videoUrl.isNotEmpty()) {
-            episode.videoUrl
-        } else {
-            val key = animeId.ifEmpty { animeTitle }
-            AnimeEpisodeCatalog.getAnimeVideoUrl(key, episode.episodeNumber)
-        }
+    val videoStreamUrl = remember(episode.videoUrl, episode.episodeNumber, animeId, animeTitle, selectedQuality, currentSource) {
+        val key = animeId.ifEmpty { animeTitle }
+        AnimeEpisodeCatalog.getAnimeVideoUrl(key, episode.episodeNumber, selectedQuality)
     }
 
     // Playback progress ticker & synchronized MediaPlayer tracking (NEVER loop, sync position accurately)
@@ -319,7 +315,7 @@ fun VideoPlayerView(
 
     // Orchestrate MediaPlayer loading and preparation whenever video stream or surface changes
     LaunchedEffect(videoStreamUrl, activeSurface) {
-        currentPositionSeconds = 0
+        val resumePos = currentPositionSeconds
         realDurationSeconds = 0
         val surface = activeSurface ?: return@LaunchedEffect
         try {
@@ -354,6 +350,7 @@ fun VideoPlayerView(
                 } catch (e: Exception) {
                     setDataSource(context, Uri.parse(videoStreamUrl))
                 }
+                setVideoScalingMode(MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT)
                 isLooping = false // NEVER repeat or loop episodes
                 setOnPreparedListener { player ->
                     isBuffering = false
@@ -361,6 +358,11 @@ fun VideoPlayerView(
                     val durSec = player.duration / 1000
                     if (durSec > 0) {
                         realDurationSeconds = durSec
+                    }
+                    if (resumePos > 0) {
+                        try {
+                            player.seekTo((resumePos * 1000).coerceAtLeast(0))
+                        } catch (e: Exception) { }
                     }
                     if (isPlaying) {
                         try {
@@ -554,23 +556,8 @@ fun VideoPlayerView(
                     modifier = Modifier.fillMaxSize()
                 )
 
-                // Layer 3: Cinematic Vignette & Ambient Gradient
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(
-                            Brush.verticalGradient(
-                                listOf(
-                                    Color(0x77000000),
-                                    Color.Transparent,
-                                    Color(0x99000000)
-                                )
-                            )
-                        )
-                )
-
-                // Layer 4: Live Audio/Stream Visualizer Equalizer Badge (Shows media is actively streaming)
-                if (isPlaying) {
+                // Visualizer Equalizer Badge (Shows when controls are visible)
+                if (isPlaying && showControls) {
                     Row(
                         modifier = Modifier
                             .align(Alignment.TopEnd)
@@ -778,16 +765,33 @@ fun VideoPlayerView(
                         Surface(
                             onClick = { showQualityMenu = true },
                             shape = RoundedCornerShape(16.dp),
-                            color = Color(0x66FFFFFF),
+                            color = Color(0x77000000),
+                            border = androidx.compose.foundation.BorderStroke(1.dp, AnimeCyan.copy(alpha = 0.5f)),
                             modifier = Modifier.height(28.dp)
                         ) {
-                            Text(
-                                text = selectedQuality,
-                                color = Color.White,
-                                fontSize = 10.sp,
-                                fontWeight = FontWeight.Bold,
-                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp)
-                            )
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.LiveTv,
+                                    contentDescription = "Stream Quality",
+                                    tint = AnimeCyan,
+                                    modifier = Modifier.size(13.dp)
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(
+                                    text = when (selectedQuality) {
+                                        "1080p" -> "1080p FHD"
+                                        "720p" -> "720p HD"
+                                        "360p" -> "360p SD"
+                                        else -> selectedQuality
+                                    },
+                                    color = Color.White,
+                                    fontSize = 10.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
                         }
 
                         DropdownMenu(
@@ -795,11 +799,23 @@ fun VideoPlayerView(
                             onDismissRequest = { showQualityMenu = false },
                             modifier = Modifier.background(DarkSurface)
                         ) {
-                            listOf("1080p", "720p", "480p", "360p", "Auto").forEach { q ->
+                            listOf(
+                                "1080p" to "1080p • Full HD (Ultra Clear)",
+                                "720p" to "720p • High Definition",
+                                "360p" to "360p • Data Saver",
+                                "Auto" to "Auto • Highest Fidelity"
+                            ).forEach { (qKey, qLabel) ->
                                 DropdownMenuItem(
-                                    text = { Text(q, color = if (selectedQuality == q) AnimeCyan else Color.White) },
+                                    text = {
+                                        Text(
+                                            text = qLabel,
+                                            color = if (selectedQuality == qKey) AnimeCyan else Color.White,
+                                            fontWeight = if (selectedQuality == qKey) FontWeight.Bold else FontWeight.Normal,
+                                            fontSize = 12.sp
+                                        )
+                                    },
                                     onClick = {
-                                        selectedQuality = q
+                                        selectedQuality = qKey
                                         showQualityMenu = false
                                     }
                                 )

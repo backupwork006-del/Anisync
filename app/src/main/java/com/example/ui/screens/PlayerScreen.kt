@@ -103,6 +103,10 @@ fun PlayerScreen(
 
     var isFullscreen by remember { mutableStateOf(false) }
 
+    val effectiveAnimeId = remember(anime.id, currentSeasonNumber) {
+        if (currentSeasonNumber > 1) "${anime.id}-season-$currentSeasonNumber" else anime.id
+    }
+
     if (isFullscreen) {
         Box(
             modifier = Modifier
@@ -113,7 +117,7 @@ fun PlayerScreen(
                 VideoPlayerView(
                     episode = currentEpisode,
                     animeTitle = "${anime.title} (${activeSeason.title})",
-                    animeId = anime.id,
+                    animeId = effectiveAnimeId,
                     backdropUrl = currentEpisode.thumbnail.ifEmpty { activeSeason.bannerUrl.ifEmpty { anime.bannerUrl } },
                     playerViewMode = playerMode,
                     selectedSourceIndex = activeSourceIndex,
@@ -149,7 +153,7 @@ fun PlayerScreen(
                 VideoPlayerView(
                     episode = currentEpisode,
                     animeTitle = "${anime.title} (${activeSeason.title})",
-                    animeId = anime.id,
+                    animeId = effectiveAnimeId,
                     backdropUrl = currentEpisode.thumbnail.ifEmpty { activeSeason.bannerUrl.ifEmpty { anime.bannerUrl } },
                     playerViewMode = playerMode,
                     selectedSourceIndex = activeSourceIndex,

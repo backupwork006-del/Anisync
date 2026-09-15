@@ -27,35 +27,47 @@ object AnimeEpisodeCatalog {
     private const val CHAINSAW_VIDEO_URL = "https://archive.org/download/chainsaw-man-the-movie-reze-arc-official-teaser-2-1080p-24fps-h-264-128kbit-aac/%E2%80%9DChainsaw%20Man%20%E2%80%93%20The%20Movie%3B%20Reze%20Arc%E2%80%9D%20Official%20Teaser%202%EF%BC%8F%E5%89%A7%E5%A0%B4%E7%89%88%E3%80%8E%E3%83%81%E3%82%A7%E3%83%B3%E3%82%BD%E3%83%BC%E3%83%9E%E3%83%B3%20%E3%83%AC%E3%82%AC%E7%AF%87%E3%80%8F%E7%89%B9%E5%A0%B1%20%281080p_24fps_H264-128kbit_AAC%29.mp4"
     private const val ANIME_SAKUGA_VIDEO_URL = "https://archive.org/download/action-sakuga-mad_202503/Action%20%E3%82%A2%E3%82%AF%E3%82%B7%E3%83%A7%E3%83%B3%20Sakuga%20%E4%BD%9C%E7%94%BB%20MAD.mp4"
 
-    fun getAttackOnTitanEpisodeVideo(episodeNumber: Int): String {
+    fun getAttackOnTitanEpisodeVideo(episodeNumber: Int, quality: String = "1080p"): String {
         val ep = episodeNumber.coerceIn(1, 25)
-        return "https://archive.org/download/shingeki-no-kyojin-episode-1/shingeki-no-kyojin-episode-$ep.mp4"
+        return when (quality) {
+            "360p", "480p" -> "https://archive.org/download/shingeki-no-kyojin-episode-1/shingeki-no-kyojin-episode-$ep.mp4"
+            else -> "https://archive.org/download/shingeki-no-kyojin_aot/season-1_DUB-1080p/Attack_on_Titan-E$ep-1080p.mp4"
+        }
     }
 
-    fun getAttackOnTitanSeason2Video(episodeNumber: Int): String {
-        val mappedEp = ((episodeNumber - 1) % 25) + 1
-        return "https://archive.org/download/shingeki-no-kyojin-episode-1/shingeki-no-kyojin-episode-$mappedEp.mp4"
+    fun getAttackOnTitanSeason2Video(episodeNumber: Int, quality: String = "1080p"): String {
+        val ep = episodeNumber.coerceIn(1, 12)
+        return when (quality) {
+            "360p", "480p" -> "https://archive.org/download/shingeki-no-kyojin-episode-1/shingeki-no-kyojin-episode-$ep.mp4"
+            else -> "https://archive.org/download/shingeki-no-kyojin_aot/season-2_DUB-1080p/Attack_on_Titan_Season_2-E$ep-1080p.mp4"
+        }
     }
 
-    fun getAttackOnTitanSeason3Video(episodeNumber: Int): String {
-        val mappedEp = ((episodeNumber - 1) % 25) + 1
-        return "https://archive.org/download/shingeki-no-kyojin-episode-1/shingeki-no-kyojin-episode-$mappedEp.mp4"
+    fun getAttackOnTitanSeason3Video(episodeNumber: Int, quality: String = "1080p"): String {
+        val ep = episodeNumber.coerceIn(1, 22)
+        return when (quality) {
+            "360p", "480p" -> "https://archive.org/download/shingeki-no-kyojin-episode-1/shingeki-no-kyojin-episode-$ep.mp4"
+            else -> "https://archive.org/download/shingeki-no-kyojin_aot/season-3_DUB-1080p/Attack_on_Titan_Season_3-E$ep-1080p.mp4"
+        }
     }
 
-    fun getAttackOnTitanFinalSeasonVideo(episodeNumber: Int): String {
-        val mappedEp = ((episodeNumber - 1) % 25) + 1
-        return "https://archive.org/download/shingeki-no-kyojin-episode-1/shingeki-no-kyojin-episode-$mappedEp.mp4"
+    fun getAttackOnTitanFinalSeasonVideo(episodeNumber: Int, quality: String = "1080p"): String {
+        val mappedEp = ((episodeNumber - 1) % 16) + 1
+        return when (quality) {
+            "360p", "480p" -> "https://archive.org/download/shingeki-no-kyojin-episode-1/shingeki-no-kyojin-episode-$mappedEp.mp4"
+            else -> "https://archive.org/download/shingeki-no-kyojin_aot/season-finale-pt-1_DUB-1080p/Attack_on_Titan_Final_Season,_Part_1-E$mappedEp-1080p.mp4"
+        }
     }
 
-    fun getAnimeVideoUrl(animeId: String, episodeNumber: Int = 1): String {
+    fun getAnimeVideoUrl(animeId: String, episodeNumber: Int = 1, quality: String = "1080p"): String {
         return when {
-            animeId == "attack-on-titan" || animeId == "attack-on-titan-season-1" -> getAttackOnTitanEpisodeVideo(episodeNumber)
-            animeId == "attack-on-titan-season-2" -> getAttackOnTitanSeason2Video(episodeNumber)
-            animeId == "attack-on-titan-season-3" -> getAttackOnTitanSeason3Video(episodeNumber)
-            animeId == "attack-on-titan-the-final-season" || animeId == "attack-on-titan-season-4" -> getAttackOnTitanFinalSeasonVideo(episodeNumber)
+            animeId == "attack-on-titan" || animeId == "attack-on-titan-season-1" -> getAttackOnTitanEpisodeVideo(episodeNumber, quality)
+            animeId == "attack-on-titan-season-2" -> getAttackOnTitanSeason2Video(episodeNumber, quality)
+            animeId == "attack-on-titan-season-3" -> getAttackOnTitanSeason3Video(episodeNumber, quality)
+            animeId == "attack-on-titan-the-final-season" || animeId == "attack-on-titan-season-4" -> getAttackOnTitanFinalSeasonVideo(episodeNumber, quality)
             animeId == "jujutsu-kaisen-s2" -> getJujutsuKaisenEpisodeVideo(episodeNumber)
             animeId == "chainsaw-man" -> getChainsawEpisodeVideo(episodeNumber)
-            else -> getAttackOnTitanEpisodeVideo(episodeNumber)
+            else -> getAttackOnTitanEpisodeVideo(episodeNumber, quality)
         }
     }
 
@@ -93,18 +105,44 @@ object AnimeEpisodeCatalog {
             "bleach-thousand-year-blood-war" -> "bleach-thousand-year-blood-war-18151"
             else -> cleanSlug
         }
-        val directUrl = when {
-            cleanSlug == "attack-on-titan-season-2" -> getAttackOnTitanSeason2Video(epNum)
-            cleanSlug == "attack-on-titan-season-3" -> getAttackOnTitanSeason3Video(epNum)
-            cleanSlug == "attack-on-titan-the-final-season" || cleanSlug == "attack-on-titan-season-4" -> getAttackOnTitanFinalSeasonVideo(epNum)
-            else -> getAttackOnTitanEpisodeVideo(epNum)
+        val direct1080Url = when {
+            cleanSlug == "attack-on-titan-season-2" -> getAttackOnTitanSeason2Video(epNum, "1080p")
+            cleanSlug == "attack-on-titan-season-3" -> getAttackOnTitanSeason3Video(epNum, "1080p")
+            cleanSlug == "attack-on-titan-the-final-season" || cleanSlug == "attack-on-titan-season-4" -> getAttackOnTitanFinalSeasonVideo(epNum, "1080p")
+            cleanSlug.startsWith("attack-on-titan") -> getAttackOnTitanEpisodeVideo(epNum, "1080p")
+            cleanSlug == "jujutsu-kaisen-s2" -> getJujutsuKaisenEpisodeVideo(epNum)
+            cleanSlug == "chainsaw-man" -> getChainsawEpisodeVideo(epNum)
+            else -> getAttackOnTitanEpisodeVideo(epNum, "1080p")
+        }
+        val direct360Url = when {
+            cleanSlug == "attack-on-titan-season-2" -> getAttackOnTitanSeason2Video(epNum, "360p")
+            cleanSlug == "attack-on-titan-season-3" -> getAttackOnTitanSeason3Video(epNum, "360p")
+            cleanSlug == "attack-on-titan-the-final-season" || cleanSlug == "attack-on-titan-season-4" -> getAttackOnTitanFinalSeasonVideo(epNum, "360p")
+            cleanSlug.startsWith("attack-on-titan") -> getAttackOnTitanEpisodeVideo(epNum, "360p")
+            else -> direct1080Url
         }
         return listOf(
             StreamSource(
-                serverName = "Direct Stream (AOT Full HD)",
+                serverName = "Direct Stream 1080p (Crystal Clear)",
                 provider = AnimeSource.HIANIME,
-                streamUrl = directUrl,
+                streamUrl = direct1080Url,
                 quality = "1080p",
+                isEmbed = false,
+                isDub = false
+            ),
+            StreamSource(
+                serverName = "Direct Stream 720p (High Definition)",
+                provider = AnimeSource.HIANIME,
+                streamUrl = direct1080Url,
+                quality = "720p",
+                isEmbed = false,
+                isDub = false
+            ),
+            StreamSource(
+                serverName = "Direct Stream 360p (Data Saver)",
+                provider = AnimeSource.HIANIME,
+                streamUrl = direct360Url,
+                quality = "360p",
                 isEmbed = false,
                 isDub = false
             ),

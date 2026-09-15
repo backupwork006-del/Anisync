@@ -12,7 +12,17 @@ object AnimeSubtitlesProvider {
     fun getSubtitlesFor(animeIdOrTitle: String, episodeNumber: Int): List<SubtitleEntry> {
         val lower = animeIdOrTitle.lowercase()
         return when {
-            lower.contains("titan") || lower.contains("kyojin") || lower.contains("aot") -> getAttackOnTitanSubtitles(episodeNumber)
+            lower.contains("titan") || lower.contains("kyojin") || lower.contains("aot") -> {
+                if (lower.contains("season-2") || lower.contains("season 2")) {
+                    getAttackOnTitanSeason2Subtitles(episodeNumber)
+                } else if (lower.contains("season-3") || lower.contains("season 3")) {
+                    getAttackOnTitanSeason3Subtitles(episodeNumber)
+                } else if (lower.contains("final") || lower.contains("season-4") || lower.contains("season 4")) {
+                    getAttackOnTitanFinalSeasonSubtitles(episodeNumber)
+                } else {
+                    getAttackOnTitanSubtitles(episodeNumber)
+                }
+            }
             lower.contains("jujutsu") || lower.contains("kaisen") -> getJujutsuKaisenSubtitles(episodeNumber)
             lower.contains("solo leveling") -> getSoloLevelingSubtitles(episodeNumber)
             lower.contains("frieren") -> getFrierenSubtitles(episodeNumber)
@@ -230,6 +240,102 @@ object AnimeSubtitlesProvider {
             SubtitleEntry(0, 8, "Attack on Titan Season 1 • Episode $ep: Official Stream", "進撃の巨人 第${ep}話 本編"),
             SubtitleEntry(9, 20, "High Definition dual audio Japanese with English Subtitles.", "HD高精細ストリーミング 日本語音声 / 英語字幕"),
             SubtitleEntry(21, 45, "Watch Eren, Mikasa, and Armin fight for humanity's survival.", "人類の自由と生存をかけた戦い")
+        )
+    }
+
+    private fun getAttackOnTitanSeason2Subtitles(ep: Int): List<SubtitleEntry> = when (ep) {
+        1 -> listOf(
+            SubtitleEntry(0, 8, "Season 2 Premiere: Titans appear deep within Wall Rose without a breach!", "第2期 第1話――ウォール・ローゼ内に巨人の群れが出現！突破口はない！"),
+            SubtitleEntry(9, 22, "A massive beast covered in dark fur emerges from the forest: The Beast Titan!", "森の奥から全身を獣の毛で覆われた巨大な影――獣の巨人が姿を現す！"),
+            SubtitleEntry(23, 40, "Section Commander Miche Zacharias engages nine Titans alone to buy time for cadets.", "ミケ分隊長が部下を逃がすため、単身で9体の巨人を迎え撃つ。"),
+            SubtitleEntry(41, 58, "The Beast Titan grabs Miche's horse and hurls it across the sky with terrifying force!", "獣の巨人が馬を鷲掴みにし、驚異的な投擲力で投げつけてくる！"),
+            SubtitleEntry(59, 75, "The Beast Titan speaks with human intellect: 'What is that weapon on your waist?'", "獣の巨人が人間の言葉で喋る――「その腰の武器は何ていうの？」"),
+            SubtitleEntry(76, 95, "[Miche] 'Humanity will only be defeated... when they give up the will to fight!'", "[ミケ] 人は戦うことをやめた時、初めて敗北する！")
+        )
+        6 -> listOf(
+            SubtitleEntry(0, 8, "Atop Wall Rose: The Scout Regiment rests in the swirling mist...", "霧煙るウォール・ローゼの壁上――激闘を終えた調査兵団の休息..."),
+            SubtitleEntry(9, 25, "[Reiner Braun] 'Eren, five years ago, we breached Wall Maria and attacked mankind.'", "[ライナー] エレン、5年前、俺達が壁を破壊して人類への攻撃を始めた。"),
+            SubtitleEntry(26, 42, "[Reiner] 'I am the Armored Titan, and he is the Colossal Titan.'", "[ライナー] 俺が鎧の巨人で、こいつが超大型巨人ってやつだ。"),
+            SubtitleEntry(43, 60, "[Eren] 'What are you saying, Reiner?! You're exhausted, you've lost your mind!'", "[エレン] 何言ってんだよライナー？！お前疲れて頭がおかしくなってんだよ！"),
+            SubtitleEntry(61, 78, "[Reiner] 'It's true that I lost who I was... but my duty will be fulfilled right here!'", "[ライナー] ここで決着をつける！もう何が正しいかわからん...だが俺の役目を果たす！"),
+            SubtitleEntry(79, 95, "Mikasa's blades slash in a blur! Lightning descends and transforms both into Titans!!", "ミカサの刃が一閃！直後、天を突く二条の雷光が落ち、二人が巨人と化す！！")
+        )
+        12 -> listOf(
+            SubtitleEntry(0, 8, "Season 2 Climax: Surrounded by pure Titans, the Scouts are on the brink of slaughter...", "第2期クライマックス――無数の巨人に包囲され、壊滅寸前の調査兵団..."),
+            SubtitleEntry(9, 24, "The Smiling Titan that ate Eren's mother reaches out its colossal hand toward them!", "母カルラを食った巨人が、エレンとミカサの前に再び立ちはだかる！"),
+            SubtitleEntry(25, 42, "[Hannes] 'Watch me, Carla! I will avenge you and protect these kids with my life!'", "[ハンネス] 見ててください、カルラさん！俺がお前の仇を討ち、二人を護る！"),
+            SubtitleEntry(43, 60, "[Mikasa] 'Eren, thank you for wrapping this scarf around me... thank you.'", "[ミカサ] エレン、マフラーを巻いてくれてありがとう...ありがとう。"),
+            SubtitleEntry(61, 78, "[Eren] 'I'll wrap it around you as many times as you want! Now and forever!!'", "[エレン] そんなもん、何度でも巻いてやる！これからもずっと、何度でも！！"),
+            SubtitleEntry(79, 95, "Eren punches the Smiling Titan's palm! Golden sparks erupt: The Founding Titan awakens!!", "エレンの拳が巨人の掌を殴りつける！黄金の光が炸裂――座標の力が覚醒する！！")
+        )
+        else -> listOf(
+            SubtitleEntry(0, 8, "Attack on Titan Season 2 • Episode $ep: Official Stream", "進撃の巨人 Season 2 第${ep}話 本編"),
+            SubtitleEntry(9, 25, "The Scout Regiment uncovers the deepest mysteries of the walls.", "壁の真実と裏切り、巨人の謎に迫る調査兵団"),
+            SubtitleEntry(26, 45, "High Definition dual audio stream with English Subtitles.", "フルHD 高画質ストリーミング配信")
+        )
+    }
+
+    private fun getAttackOnTitanSeason3Subtitles(ep: Int): List<SubtitleEntry> = when (ep) {
+        16 -> listOf(
+            SubtitleEntry(0, 8, "Battle of Shiganshina: The Beast Titan unleashes a lethal volley of crushed boulders!", "シガンシナ区決戦――獣の巨人が粉砕岩石の猛射を放ち、調査兵団を薙ぎ払う！"),
+            SubtitleEntry(9, 25, "New recruits tremble in terror as comrades are obliterated by rock shrapnel.", "岩の散弾に仲間が次々と粉砕され、絶望に震える新兵たち。"),
+            SubtitleEntry(26, 42, "[Erwin Smith] 'It means nothing to die without meaning... but we are the ones who give meaning to our fallen!'", "[エルヴィン] 死んだ仲間たちに意味を与えるのは、生きている我々だ！"),
+            SubtitleEntry(43, 60, "[Erwin] 'My soldiers, rage! My soldiers, scream! My soldiers, fight!!'", "[エルヴィン] 兵士よ怒れ！兵士よ叫べ！兵士よ戦え！！"),
+            SubtitleEntry(61, 78, "Commander Erwin leads the suicidal charge into the storm of flying stones!", "エルヴィン団長を先頭に、新兵たちが散弾の嵐の中を怒涛の突撃！"),
+            SubtitleEntry(79, 95, "Levi flanks along the Titan line in the smoke: 'Erwin... your sacrifice won't be in vain!'", "煙幕の中を疾走するリヴァイ――「エルヴィン...お前の死を無駄にはしない！」")
+        )
+        17 -> listOf(
+            SubtitleEntry(0, 8, "Levi Ackerman strikes the Beast Titan from the blind spot in the mist!", "リヴァイ・アッカーマン、煙幕の死角から獣の巨人を強襲！"),
+            SubtitleEntry(9, 25, "Blades spinning like a sonic hurricane, Levi shreds the Beast Titan's arm and eyes in seconds!", "竜巻のような回転刃で獣の巨人の腕と目を瞬時に切り裂くリヴァイ！"),
+            SubtitleEntry(26, 45, "[Levi] 'What's the matter? You were having so much fun crushing my soldiers!'", "[リヴァイ] おい...さっきまで楽しそうだったじゃねぇか！"),
+            SubtitleEntry(46, 65, "Levi drags Zeke Yeager out of the smoking nape: 'I made a promise to him!'", "うなじからジークを引きずり出す――「俺はあいつに誓ったんだよ！」"),
+            SubtitleEntry(66, 80, "Meanwhile, Armin sacrifices his body to the Colossal Titan's blistering steam.", "一方、アルミンは超大型巨人の放つ灼熱蒸気を受け止め、身を挺する。"),
+            SubtitleEntry(81, 95, "Eren slices Bertholdt from behind: 'Armin... you really are the bravest of us all.'", "エレンが背後からベルトルトを強襲――「アルミン...お前が一番勇敢だ。」")
+        )
+        22 -> listOf(
+            SubtitleEntry(0, 8, "Season 3 Finale: Beyond the Walls, the Scout Regiment rides across empty plains...", "第3期 最終話――壁の向こう側、白砂の荒野を馬で駆け抜ける調査兵団..."),
+            SubtitleEntry(9, 25, "The vast blue ocean stretches infinitely to the horizon: Humanity has reached the sea!", "水平線の彼方まで広がる青い海――人類がついに海へ到達する！"),
+            SubtitleEntry(26, 42, "Mikasa, Armin, and Sasha splash joyfully in the salt water with bright smiles.", "塩水をすくい、歓喜の声を上げてはしゃぐミカサ、アルミン、サシャ。"),
+            SubtitleEntry(43, 60, "Eren stands alone in the surf, pointing across the distant endless waters.", "ひとり波打ち際に立ち、海の向こうを指差すエレン・イェーガー。"),
+            SubtitleEntry(61, 78, "[Eren] 'I thought if we reached the sea, we would be free... but on the other side is an enemy.'", "[エレン] 海の向こうには自由があると思ってた...でも、いたのは敵だ。"),
+            SubtitleEntry(79, 95, "[Eren] 'If we kill everyone over there... will we finally be free?'", "[エレン] 向こうにいる敵...全部殺せば、俺達は自由になれるのか？")
+        )
+        else -> listOf(
+            SubtitleEntry(0, 8, "Attack on Titan Season 3 • Episode $ep: Official Stream", "進撃の巨人 Season 3 第${ep}話 本編"),
+            SubtitleEntry(9, 25, "Return to Shiganshina and the historic revelation of Grisha's basement.", "ウォール・マリア奪還作戦と地下室の真実"),
+            SubtitleEntry(26, 45, "High Definition dual audio stream with English Subtitles.", "フルHD 高画質ストリーミング配信")
+        )
+    }
+
+    private fun getAttackOnTitanFinalSeasonSubtitles(ep: Int): List<SubtitleEntry> = when (ep) {
+        5 -> listOf(
+            SubtitleEntry(0, 8, "Liberio Internment Zone, Marley: Festival and gathering of world ambassadors...", "マーレ・レベリオ収容区――世界各国の要人が集まる演説の舞台..."),
+            SubtitleEntry(9, 25, "In the dark basement below, Eren sits across from the trembling Reiner Braun.", "舞台下の暗い地下室で、震えるライナーと向き合うエレン・イェーガー。"),
+            SubtitleEntry(26, 42, "[Eren] 'I'm the same as you, Reiner. Across the ocean, inside the walls... we're all the same.'", "[エレン] 俺はお前と同じだ、ライナー。海の向こうも、壁の中も、同じなんだ。"),
+            SubtitleEntry(43, 60, "Willy Tybur declares atop the stage: 'To the demons of Paradis Island... I declare war!!'", "壇上のヴィリー・タイバーが叫ぶ――「パラディ島の悪魔たちへ...宣戦布告を！！」"),
+            SubtitleEntry(61, 78, "[Eren] 'I will keep moving forward... until my enemies are destroyed.'", "[エレン] 俺は進み続ける...敵を駆逐するまで。"),
+            SubtitleEntry(79, 95, "Eren transforms through the building! The Attack Titan obliterates the stage in thunder!", "地下から巨人が炸裂！進撃の巨人がヴィリー・タイバーを握り潰す！！")
+        )
+        28 -> listOf(
+            SubtitleEntry(0, 8, "The Rumbling: Tens of thousands of Colossal Wall Titans march into the ocean...", "地鳴らし発動――無数の超大型巨人が海を渡り、大陸へと上陸する..."),
+            SubtitleEntry(9, 25, "The global allied fleet unleashes full artillery, but the colossal heat wave incinerates the warships!", "世界連合艦隊の一斉砲撃も虚しく、圧倒的な熱蒸気が戦艦群を焼き尽くす！"),
+            SubtitleEntry(26, 42, "Eren's skeletal Founding Titan towers hundreds of meters high, leading the march.", "数百メートルに及ぶエレンの始祖の巨人が、世界の終焉を導く。"),
+            SubtitleEntry(43, 60, "[Eren] 'My name is Eren Yeager. I speak to all Subjects of Ymir...'", "[エレン] 我が名はエレン・イェーガー。全てのユミルの民へ告ぐ..."),
+            SubtitleEntry(61, 78, "[Eren] 'My goal is to protect the people of Paradis. I will trample all lands outside the island.'", "[エレン] オレの目的はパラディ島の人々を守ること。島の外にある全ての命を駆逐する。"),
+            SubtitleEntry(79, 95, "The world trembles as the colossal footfalls begin to crush the earth.", "地響きが世界を覆い尽くし、人類の歴史が激変する。")
+        )
+        30 -> listOf(
+            SubtitleEntry(0, 8, "The Battle of Heaven and Earth: Climax of Attack on Titan!", "天と地の戦い――進撃の巨人 堂々の完結編クライマックス！"),
+            SubtitleEntry(9, 25, "Mikasa, Armin, Levi, and the alliance clash atop the ribs of the Founding Titan.", "ミカサ、アルミン、リヴァイがエレンの始祖の巨人の背上で最後の戦いに挑む。"),
+            SubtitleEntry(26, 42, "[Armin] 'Eren, thank you for becoming a monster for our sake...'", "[アルミン] エレン、僕たちのために悪者になってくれて、ありがとう..."),
+            SubtitleEntry(43, 60, "[Mikasa] 'See you later, Eren.'", "[ミカサ] いってらっしゃい、エレン。"),
+            SubtitleEntry(61, 78, "Mikasa enters the Titan's mouth and delivers the final blow with tears in her eyes.", "巨人の口内に入り、涙とともに最期の一撃を放つミカサ。"),
+            SubtitleEntry(79, 95, "Peace returns to the world. A bird tugs at Mikasa's scarf by the lonely tree on the hill.", "戦いが終わり、丘の上の木の下で、鳥がミカサのマフラーを優しく巻き直す。")
+        )
+        else -> listOf(
+            SubtitleEntry(0, 8, "Attack on Titan The Final Season • Episode $ep: Official Stream", "進撃の巨人 The Final Season 第${ep}話 本編"),
+            SubtitleEntry(9, 25, "The ultimate conflict between Marley and Paradis Island.", "マーレとパラディ島、世界の命運を分ける最終決戦"),
+            SubtitleEntry(26, 45, "High Definition dual audio stream with English Subtitles.", "フルHD 高画質ストリーミング配信")
         )
     }
 

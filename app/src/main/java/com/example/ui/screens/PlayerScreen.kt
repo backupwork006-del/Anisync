@@ -46,6 +46,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.data.model.WatchStatus
+import com.example.data.scraper.CuratedAnimeCatalog
 import com.example.ui.MainViewModel
 import com.example.ui.Screen
 import com.example.ui.components.EpisodeItem
@@ -91,37 +92,76 @@ fun PlayerScreen(
         )
     }
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .background(DarkBackground)
-    ) {
-        // Video Player HUD
-        androidx.compose.runtime.key(currentEpisode.episodeNumber) {
-            VideoPlayerView(
-                episode = currentEpisode,
-                animeTitle = anime.title,
-                animeId = anime.id,
-                backdropUrl = currentEpisode.thumbnail.ifEmpty { anime.bannerUrl.ifEmpty { anime.posterUrl } },
-                playerViewMode = playerMode,
-                selectedSourceIndex = activeSourceIndex,
-                onPlayerViewModeChange = { playerMode = it },
-                onSourceIndexChange = { activeSourceIndex = it },
-                onBack = { viewModel.navigateTo(Screen.AnimeDetail(anime.id)) },
-                onNextEpisode = {
-                    val next = currentEpNum + 1
-                    if (next <= anime.currentEpisodes) {
-                        currentEpNum = next
-                    }
-                },
-                onProgressUpdate = { frac ->
-                    if (frac > 0.85f) {
-                        // Mark watched
-                        viewModel.updateWatchlistProgress(anime.id, currentEpNum)
-                    }
-                }
-            )
+    var isFullscreen by remember { mutableStateOf(false) }
+
+    if (isFullscreen) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black)
+        ) {
+            androidx.compose.runtime.key(currentEpisode.episodeNumber) {
+                VideoPlayerView(
+                    episode = currentEpisode,
+                    animeTitle = anime.title,
+                    animeId = anime.id,
+                    backdropUrl = currentEpisode.thumbnail.ifEmpty { anime.bannerUrl.ifEmpty { anime.posterUrl } },
+                    playerViewMode = playerMode,
+                    selectedSourceIndex = activeSourceIndex,
+                    isFullscreen = true,
+                    onPlayerViewModeChange = { playerMode = it },
+                    onSourceIndexChange = { activeSourceIndex = it },
+                    onFullscreenToggle = { isFullscreen = it },
+                    onBack = { isFullscreen = false },
+                    onNextEpisode = {
+                        val next = currentEpNum + 1
+                        if (next <= anime.currentEpisodes) {
+                            currentEpNum = next
+                        }
+                    },
+                    onProgressUpdate = { frac ->
+                        if (frac > 0.85f) {
+                            viewModel.updateWatchlistProgress(anime.id, currentEpNum)
+                        }
+                    },
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
         }
+    } else {
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .background(DarkBackground)
+        ) {
+            // Video Player HUD
+            androidx.compose.runtime.key(currentEpisode.episodeNumber) {
+                VideoPlayerView(
+                    episode = currentEpisode,
+                    animeTitle = anime.title,
+                    animeId = anime.id,
+                    backdropUrl = currentEpisode.thumbnail.ifEmpty { anime.bannerUrl.ifEmpty { anime.posterUrl } },
+                    playerViewMode = playerMode,
+                    selectedSourceIndex = activeSourceIndex,
+                    isFullscreen = false,
+                    onPlayerViewModeChange = { playerMode = it },
+                    onSourceIndexChange = { activeSourceIndex = it },
+                    onFullscreenToggle = { isFullscreen = it },
+                    onBack = { viewModel.navigateTo(Screen.AnimeDetail(anime.id)) },
+                    onNextEpisode = {
+                        val next = currentEpNum + 1
+                        if (next <= anime.currentEpisodes) {
+                            currentEpNum = next
+                        }
+                    },
+                    onProgressUpdate = { frac ->
+                        if (frac > 0.85f) {
+                            // Mark watched
+                            viewModel.updateWatchlistProgress(anime.id, currentEpNum)
+                        }
+                    }
+                )
+            }
 
         // Episode Information & Quick Actions
         LazyColumn(
@@ -279,6 +319,51 @@ fun PlayerScreen(
                 Spacer(modifier = Modifier.height(16.dp))
             }
 
+            // Season Selector
+            val allSeasons = CuratedAnimeCatalog.getAllCuratedAnime()
+            if (allSeasons.size > 1) {
+                item {
+                    Text(
+                        text = "Seasons",
+                        color = Color.White,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    LazyRow(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(allSeasons) { s ->
+                            val isSelected = s.id == anime.id
+                            Surface(
+                                shape = RoundedCornerShape(8.dp),
+                                color = if (isSelected) AnimeCyan else DarkSurface,
+                                modifier = Modifier.clickable {
+                                    if (!isSelected) {
+                                        viewModel.navigateTo(Screen.Player(s.id, 1))
+                                    }
+                                }
+                            ) {
+                                Text(
+                                    text = when (s.id) {
+                                        "attack-on-titan" -> "Season 1 (25 EP)"
+                                        "attack-on-titan-season-2" -> "Season 2 (12 EP)"
+                                        "attack-on-titan-season-3" -> "Season 3 (22 EP)"
+                                        "attack-on-titan-the-final-season" -> "Final Season (30 EP)"
+                                        else -> s.title
+                                    },
+                                    color = if (isSelected) Color.Black else Color.White,
+                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                                    fontSize = 11.sp,
+                                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
+                                )
+                            }
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
+            }
+
             // Quick Jump Episode Row (Pills 1..N)
             item {
                 Text(
@@ -334,4 +419,5 @@ fun PlayerScreen(
             }
         }
     }
+}
 }

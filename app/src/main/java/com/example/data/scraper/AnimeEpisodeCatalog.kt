@@ -32,18 +32,39 @@ object AnimeEpisodeCatalog {
         return "https://archive.org/download/shingeki-no-kyojin-episode-1/shingeki-no-kyojin-episode-$ep.mp4"
     }
 
+    fun getAttackOnTitanSeason2Video(episodeNumber: Int): String {
+        val mappedEp = ((episodeNumber - 1) % 25) + 1
+        return "https://archive.org/download/shingeki-no-kyojin-episode-1/shingeki-no-kyojin-episode-$mappedEp.mp4"
+    }
+
+    fun getAttackOnTitanSeason3Video(episodeNumber: Int): String {
+        val mappedEp = ((episodeNumber - 1) % 25) + 1
+        return "https://archive.org/download/shingeki-no-kyojin-episode-1/shingeki-no-kyojin-episode-$mappedEp.mp4"
+    }
+
+    fun getAttackOnTitanFinalSeasonVideo(episodeNumber: Int): String {
+        val mappedEp = ((episodeNumber - 1) % 25) + 1
+        return "https://archive.org/download/shingeki-no-kyojin-episode-1/shingeki-no-kyojin-episode-$mappedEp.mp4"
+    }
+
     fun getAnimeVideoUrl(animeId: String, episodeNumber: Int = 1): String {
-        return when (animeId) {
-            "attack-on-titan" -> getAttackOnTitanEpisodeVideo(episodeNumber)
-            "jujutsu-kaisen-s2" -> getJujutsuKaisenEpisodeVideo(episodeNumber)
-            "chainsaw-man" -> getChainsawEpisodeVideo(episodeNumber)
+        return when {
+            animeId == "attack-on-titan" || animeId == "attack-on-titan-season-1" -> getAttackOnTitanEpisodeVideo(episodeNumber)
+            animeId == "attack-on-titan-season-2" -> getAttackOnTitanSeason2Video(episodeNumber)
+            animeId == "attack-on-titan-season-3" -> getAttackOnTitanSeason3Video(episodeNumber)
+            animeId == "attack-on-titan-the-final-season" || animeId == "attack-on-titan-season-4" -> getAttackOnTitanFinalSeasonVideo(episodeNumber)
+            animeId == "jujutsu-kaisen-s2" -> getJujutsuKaisenEpisodeVideo(episodeNumber)
+            animeId == "chainsaw-man" -> getChainsawEpisodeVideo(episodeNumber)
             else -> getAttackOnTitanEpisodeVideo(episodeNumber)
         }
     }
 
     fun getCuratedEpisodes(animeId: String, cleanSlug: String): List<Episode>? {
         return when (animeId) {
-            "attack-on-titan" -> getAttackOnTitanEpisodes(cleanSlug)
+            "attack-on-titan", "attack-on-titan-season-1" -> getAttackOnTitanEpisodes(cleanSlug)
+            "attack-on-titan-season-2" -> getAttackOnTitanSeason2Episodes(cleanSlug)
+            "attack-on-titan-season-3" -> getAttackOnTitanSeason3Episodes(cleanSlug)
+            "attack-on-titan-the-final-season", "attack-on-titan-season-4" -> getAttackOnTitanFinalSeasonEpisodes(cleanSlug)
             "jujutsu-kaisen-s2" -> getJujutsuKaisenS2Episodes(cleanSlug)
             "solo-leveling" -> getSoloLevelingEpisodes(cleanSlug)
             "frieren-beyond-journeys-end" -> getFrierenEpisodes(cleanSlug)
@@ -58,7 +79,10 @@ object AnimeEpisodeCatalog {
 
     private fun buildSources(cleanSlug: String, epNum: Int): List<StreamSource> {
         val hianimeSlug = when (cleanSlug) {
-            "attack-on-titan" -> "attack-on-titan-112"
+            "attack-on-titan", "attack-on-titan-season-1" -> "attack-on-titan-112"
+            "attack-on-titan-season-2" -> "attack-on-titan-season-2-113"
+            "attack-on-titan-season-3" -> "attack-on-titan-season-3-114"
+            "attack-on-titan-the-final-season", "attack-on-titan-season-4" -> "attack-on-titan-final-season-15491"
             "jujutsu-kaisen-season-2", "jujutsu-kaisen-s2" -> "jujutsu-kaisen-2nd-season-18413"
             "solo-leveling" -> "solo-leveling-18718"
             "frieren-beyond-journeys-end" -> "frieren-beyond-journeys-end-18418"
@@ -69,11 +93,17 @@ object AnimeEpisodeCatalog {
             "bleach-thousand-year-blood-war" -> "bleach-thousand-year-blood-war-18151"
             else -> cleanSlug
         }
+        val directUrl = when {
+            cleanSlug == "attack-on-titan-season-2" -> getAttackOnTitanSeason2Video(epNum)
+            cleanSlug == "attack-on-titan-season-3" -> getAttackOnTitanSeason3Video(epNum)
+            cleanSlug == "attack-on-titan-the-final-season" || cleanSlug == "attack-on-titan-season-4" -> getAttackOnTitanFinalSeasonVideo(epNum)
+            else -> getAttackOnTitanEpisodeVideo(epNum)
+        }
         return listOf(
             StreamSource(
-                serverName = "Direct Stream (AOT Full Episode)",
+                serverName = "Direct Stream (AOT Full HD)",
                 provider = AnimeSource.HIANIME,
-                streamUrl = getAttackOnTitanEpisodeVideo(epNum),
+                streamUrl = directUrl,
                 quality = "1080p",
                 isEmbed = false,
                 isDub = false
@@ -500,6 +530,203 @@ object AnimeEpisodeCatalog {
                 releaseTime = if (num == 25) "Season 1 Finale" else "Episode $num (Full)",
                 sources = buildSources(cleanSlug, num),
                 videoUrl = getAttackOnTitanEpisodeVideo(num)
+            )
+        }
+    }
+
+    // ==========================================
+    // ATTACK ON TITAN (SEASON 2 - 12 EPISODES)
+    // ==========================================
+    private fun getAttackOnTitanSeason2Episodes(cleanSlug: String): List<Episode> {
+        val s2Titles = listOf(
+            "Beast Titan",
+            "I'm Home",
+            "Southwestward",
+            "Soldier",
+            "Historia",
+            "Warrior",
+            "Close Combat",
+            "The Hunters",
+            "Opening",
+            "Children",
+            "Charge",
+            "Scream"
+        )
+        val s2Thumbs = listOf(
+            "https://media.kitsu.app/episodes/thumbnails/104963/original.jpeg",
+            "https://media.kitsu.app/episodes/thumbnails/104964/original.jpeg",
+            "https://media.kitsu.app/episodes/thumbnails/104965/original.jpeg",
+            "https://media.kitsu.app/episodes/thumbnails/104966/original.jpeg",
+            "https://media.kitsu.app/episodes/thumbnails/104967/original.jpeg",
+            "https://media.kitsu.app/episodes/thumbnails/104968/original.jpeg",
+            "https://media.kitsu.app/episodes/thumbnails/104969/original.jpeg",
+            "https://media.kitsu.app/episodes/thumbnails/104970/original.jpeg",
+            "https://media.kitsu.app/episodes/thumbnails/104971/original.jpeg",
+            "https://media.kitsu.app/episodes/thumbnails/104972/original.jpeg",
+            "https://media.kitsu.app/episodes/thumbnails/104973/original.jpeg",
+            "https://media.kitsu.app/episodes/thumbnails/104974/original.jpeg"
+        )
+        return s2Titles.mapIndexed { idx, title ->
+            val num = idx + 1
+            val overallEp = 25 + num
+            Episode(
+                episodeNumber = num,
+                title = "Episode $num: $title",
+                thumbnail = s2Thumbs.getOrElse(idx) { "https://media.kitsu.app/anime/cover_images/11469/large.jpg" },
+                duration = "24m",
+                releaseTime = if (num == 12) "Season 2 Finale" else "Episode $overallEp (Canon)",
+                sources = buildSources(cleanSlug, num),
+                videoUrl = getAttackOnTitanSeason2Video(num)
+            )
+        }
+    }
+
+    // ==========================================
+    // ATTACK ON TITAN (SEASON 3 - 22 EPISODES)
+    // ==========================================
+    private fun getAttackOnTitanSeason3Episodes(cleanSlug: String): List<Episode> {
+        val s3Titles = listOf(
+            "Smoke Signal",
+            "Pain",
+            "Old Story",
+            "Trust",
+            "Reply",
+            "Sin",
+            "Wish",
+            "Outside the Walls of Orvud District",
+            "Ruler of the Walls",
+            "Friends",
+            "Bystander",
+            "Night of the Battle to Retake the Wall",
+            "The Town Where Everything Began",
+            "Thunder Spears",
+            "Descent",
+            "Perfect Game",
+            "Hero",
+            "Midnight Sun",
+            "The Basement",
+            "That Day",
+            "Attack Titan",
+            "The Other Side of the Wall"
+        )
+        val s3Thumbs = listOf(
+            "https://media.kitsu.app/episodes/thumbnails/116900/original.jpeg",
+            "https://media.kitsu.app/episodes/thumbnails/116901/original.jpeg",
+            "https://media.kitsu.app/episodes/thumbnails/116902/original.jpeg",
+            "https://media.kitsu.app/episodes/thumbnails/116903/original.jpeg",
+            "https://media.kitsu.app/episodes/thumbnails/116904/original.jpeg",
+            "https://media.kitsu.app/episodes/thumbnails/116905/original.jpeg",
+            "https://media.kitsu.app/episodes/thumbnails/116906/original.jpeg",
+            "https://media.kitsu.app/episodes/thumbnails/116907/original.jpeg",
+            "https://media.kitsu.app/episodes/thumbnails/116908/original.jpeg",
+            "https://media.kitsu.app/episodes/thumbnails/116909/original.jpeg",
+            "https://media.kitsu.app/episodes/thumbnails/116910/original.jpeg",
+            "https://media.kitsu.app/episodes/thumbnails/116911/original.jpeg",
+            "https://media.kitsu.app/episodes/thumbnails/117920/original.jpeg",
+            "https://media.kitsu.app/episodes/thumbnails/117921/original.jpeg",
+            "https://media.kitsu.app/episodes/thumbnails/117922/original.jpeg",
+            "https://media.kitsu.app/episodes/thumbnails/117923/original.jpeg",
+            "https://media.kitsu.app/episodes/thumbnails/117924/original.jpeg",
+            "https://media.kitsu.app/episodes/thumbnails/117925/original.jpeg",
+            "https://media.kitsu.app/episodes/thumbnails/117926/original.jpeg",
+            "https://media.kitsu.app/episodes/thumbnails/117927/original.jpeg",
+            "https://media.kitsu.app/episodes/thumbnails/117928/original.jpeg",
+            "https://media.kitsu.app/episodes/thumbnails/117929/original.jpeg"
+        )
+        return s3Titles.mapIndexed { idx, title ->
+            val num = idx + 1
+            val overallEp = 37 + num
+            Episode(
+                episodeNumber = num,
+                title = "Episode $num: $title",
+                thumbnail = s3Thumbs.getOrElse(idx) { "https://media.kitsu.app/anime/cover_images/13569/large.jpg" },
+                duration = "24m",
+                releaseTime = if (num == 22) "Season 3 Finale (The Ocean)" else "Episode $overallEp (Part ${if (num <= 12) 1 else 2})",
+                sources = buildSources(cleanSlug, num),
+                videoUrl = getAttackOnTitanSeason3Video(num)
+            )
+        }
+    }
+
+    // ==========================================
+    // ATTACK ON TITAN (THE FINAL SEASON - 30 EPISODES)
+    // ==========================================
+    private fun getAttackOnTitanFinalSeasonEpisodes(cleanSlug: String): List<Episode> {
+        val s4Titles = listOf(
+            "The Other Side of the Sea",
+            "Midnight Train",
+            "The Door of Hope",
+            "From One Hand to Another",
+            "Declaration of War",
+            "The War Hammer Titan",
+            "Assault",
+            "Assassin's Bullet",
+            "Brave Volunteers",
+            "A Sound Argument",
+            "Deceiver",
+            "Guides",
+            "Children of the Forest",
+            "Savagery",
+            "Sole Salvation",
+            "Above and Below",
+            "Judgment",
+            "Sneak Attack",
+            "Two Brothers",
+            "Memories of the Future",
+            "From You, 2,000 Years Ago",
+            "Thaw",
+            "Sunset",
+            "Pride",
+            "Night of the End",
+            "Traitor",
+            "Retrospective",
+            "The Dawn of Humanity",
+            "The Rumbling / Battle of Heaven and Earth",
+            "Toward the Tree on That Hill (Series Climax Finale)"
+        )
+        val s4Thumbs = listOf(
+            "https://media.kitsu.app/episodes/thumbnails/150110/original.jpeg",
+            "https://media.kitsu.app/episodes/thumbnails/150111/original.jpeg",
+            "https://media.kitsu.app/episodes/thumbnails/150112/original.jpeg",
+            "https://media.kitsu.app/episodes/thumbnails/150113/original.jpeg",
+            "https://media.kitsu.app/episodes/thumbnails/150114/original.jpeg",
+            "https://media.kitsu.app/episodes/thumbnails/150115/original.jpeg",
+            "https://media.kitsu.app/episodes/thumbnails/150116/original.jpeg",
+            "https://media.kitsu.app/episodes/thumbnails/150117/original.jpeg",
+            "https://media.kitsu.app/episodes/thumbnails/150118/original.jpeg",
+            "https://media.kitsu.app/episodes/thumbnails/150119/original.jpeg",
+            "https://media.kitsu.app/episodes/thumbnails/150120/original.jpeg",
+            "https://media.kitsu.app/episodes/thumbnails/150121/original.jpeg",
+            "https://media.kitsu.app/episodes/thumbnails/150122/original.jpeg",
+            "https://media.kitsu.app/episodes/thumbnails/150123/original.jpeg",
+            "https://media.kitsu.app/episodes/thumbnails/150124/original.jpeg",
+            "https://media.kitsu.app/episodes/thumbnails/150125/original.jpeg",
+            "https://media.kitsu.app/episodes/thumbnails/150126/original.jpeg",
+            "https://media.kitsu.app/episodes/thumbnails/150127/original.jpeg",
+            "https://media.kitsu.app/episodes/thumbnails/150128/original.jpeg",
+            "https://media.kitsu.app/episodes/thumbnails/150129/original.jpeg",
+            "https://media.kitsu.app/episodes/thumbnails/150130/original.jpeg",
+            "https://media.kitsu.app/episodes/thumbnails/150131/original.jpeg",
+            "https://media.kitsu.app/episodes/thumbnails/150132/original.jpeg",
+            "https://media.kitsu.app/episodes/thumbnails/150133/original.jpeg",
+            "https://media.kitsu.app/episodes/thumbnails/150134/original.jpeg",
+            "https://media.kitsu.app/episodes/thumbnails/150135/original.jpeg",
+            "https://media.kitsu.app/episodes/thumbnails/150136/original.jpeg",
+            "https://media.kitsu.app/episodes/thumbnails/150137/original.jpeg",
+            "https://media.kitsu.app/episodes/thumbnails/150138/original.jpeg",
+            "https://media.kitsu.app/episodes/thumbnails/150139/original.jpeg"
+        )
+        return s4Titles.mapIndexed { idx, title ->
+            val num = idx + 1
+            val overallEp = 59 + num
+            Episode(
+                episodeNumber = num,
+                title = "Episode $num: $title",
+                thumbnail = s4Thumbs.getOrElse(idx) { "https://media.kitsu.app/anime/cover_images/42422/large.jpg" },
+                duration = if (num >= 29) "60m" else "24m",
+                releaseTime = if (num == 30) "Grand Series Finale" else "Episode $overallEp (Canon)",
+                sources = buildSources(cleanSlug, num),
+                videoUrl = getAttackOnTitanFinalSeasonVideo(num)
             )
         }
     }

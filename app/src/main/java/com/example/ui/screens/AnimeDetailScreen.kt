@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -63,6 +64,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.R
 import com.example.data.model.WatchStatus
+import com.example.data.scraper.CuratedAnimeCatalog
 import com.example.ui.MainViewModel
 import com.example.ui.Screen
 import com.example.ui.components.EpisodeItem
@@ -369,6 +371,53 @@ fun AnimeDetailScreen(
                             fontSize = 11.sp,
                             modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
                         )
+                    }
+                }
+            }
+        }
+
+        // Seasons Switcher (All Attack on Titan Seasons)
+        val allSeasons = CuratedAnimeCatalog.getAllCuratedAnime()
+        if (allSeasons.size > 1) {
+            item {
+                Spacer(modifier = Modifier.height(10.dp))
+                Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+                    Text(
+                        text = "Seasons",
+                        color = Color.White,
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    LazyRow(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(allSeasons) { s ->
+                            val isSelected = s.id == anime.id
+                            Surface(
+                                shape = RoundedCornerShape(10.dp),
+                                color = if (isSelected) AnimeCyan else DarkSurfaceHighlight,
+                                modifier = Modifier.clickable {
+                                    if (!isSelected) {
+                                        viewModel.navigateTo(Screen.AnimeDetail(s.id))
+                                    }
+                                }
+                            ) {
+                                Text(
+                                    text = when (s.id) {
+                                        "attack-on-titan" -> "Season 1 (25 EP)"
+                                        "attack-on-titan-season-2" -> "Season 2 (12 EP)"
+                                        "attack-on-titan-season-3" -> "Season 3 (22 EP)"
+                                        "attack-on-titan-the-final-season" -> "Final Season (30 EP)"
+                                        else -> s.title
+                                    },
+                                    color = if (isSelected) Color.Black else Color.White,
+                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                                    fontSize = 12.sp,
+                                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
+                                )
+                            }
+                        }
                     }
                 }
             }

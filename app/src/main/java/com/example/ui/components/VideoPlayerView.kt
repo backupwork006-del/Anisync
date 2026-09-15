@@ -1,5 +1,8 @@
 package com.example.ui.components
 
+import android.app.Activity
+import android.content.ContextWrapper
+import android.content.pm.ActivityInfo
 import android.graphics.SurfaceTexture
 import android.media.AudioAttributes
 import android.media.MediaPlayer
@@ -12,6 +15,7 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.FrameLayout
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
@@ -83,6 +87,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.R
@@ -110,14 +117,75 @@ fun VideoPlayerView(
     backdropUrl: String = "",
     playerViewMode: PlayerViewMode = PlayerViewMode.STREAM_PLAYER,
     selectedSourceIndex: Int = 0,
+    isFullscreen: Boolean = false,
     onPlayerViewModeChange: ((PlayerViewMode) -> Unit)? = null,
     onSourceIndexChange: ((Int) -> Unit)? = null,
+    onFullscreenToggle: ((Boolean) -> Unit)? = null,
     onBack: () -> Unit,
     onNextEpisode: (() -> Unit)? = null,
     onProgressUpdate: ((progressPercent: Float) -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
+    var internalFullscreen by remember { mutableStateOf(isFullscreen) }
+    LaunchedEffect(isFullscreen) {
+        internalFullscreen = isFullscreen
+    }
+    val currentFullscreen = if (onFullscreenToggle != null) isFullscreen else internalFullscreen
+    val setFullscreen: (Boolean) -> Unit = { next ->
+        internalFullscreen = next
+        onFullscreenToggle?.invoke(next)
+    }
+
+    // Auto-rotate activity to sensor landscape on fullscreen, restore to unspecified on exit
+    val activity = remember(context) {
+        var ctx = context
+        while (ctx is ContextWrapper) {
+            if (ctx is Activity) return@remember ctx
+            ctx = ctx.baseContext
+        }
+        null
+    }
+
+    LaunchedEffect(currentFullscreen) {
+        activity?.let { act ->
+            val window = act.window
+            if (currentFullscreen) {
+                act.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+                if (window != null) {
+                    WindowCompat.setDecorFitsSystemWindows(window, false)
+                    val controller = WindowCompat.getInsetsController(window, window.decorView)
+                    controller.hide(WindowInsetsCompat.Type.systemBars())
+                    controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                }
+            } else {
+                act.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+                if (window != null) {
+                    WindowCompat.setDecorFitsSystemWindows(window, true)
+                    val controller = WindowCompat.getInsetsController(window, window.decorView)
+                    controller.show(WindowInsetsCompat.Type.systemBars())
+                }
+            }
+        }
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            activity?.let { act ->
+                act.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+                act.window?.let { win ->
+                    WindowCompat.setDecorFitsSystemWindows(win, true)
+                    val controller = WindowCompat.getInsetsController(win, win.decorView)
+                    controller.show(WindowInsetsCompat.Type.systemBars())
+                }
+            }
+        }
+    }
+
+    BackHandler(enabled = currentFullscreen) {
+        setFullscreen(false)
+    }
+
     var isPlaying by remember { mutableStateOf(true) }
     var showControls by remember { mutableStateOf(true) }
     var currentPositionSeconds by remember { mutableIntStateOf(0) }
@@ -142,7 +210,6 @@ fun VideoPlayerView(
 
     var selectedSpeed by remember { mutableFloatStateOf(1.0f) }
     var isDub by remember { mutableStateOf(false) }
-    var isFullscreen by remember { mutableStateOf(false) }
     var showServerMenu by remember { mutableStateOf(false) }
     var showSpeedMenu by remember { mutableStateOf(false) }
     var showQualityMenu by remember { mutableStateOf(false) }
@@ -383,7 +450,7 @@ fun VideoPlayerView(
         modifier = modifier
             .fillMaxWidth()
             .then(
-                if (isFullscreen) Modifier.fillMaxSize()
+                if (currentFullscreen) Modifier.fillMaxSize()
                 else Modifier.aspectRatio(16f / 9f)
             )
             .background(Color.Black)
@@ -617,7 +684,13 @@ fun VideoPlayerView(
                         .padding(horizontal = 8.dp, vertical = 6.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    IconButton(onClick = onBack) {
+                    IconButton(onClick = {
+                        if (currentFullscreen) {
+                            setFullscreen(false)
+                        } else {
+                            onBack()
+                        }
+                    }) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
                             contentDescription = "Back",
@@ -960,11 +1033,11 @@ fun VideoPlayerView(
 
                             // Fullscreen Toggle
                             IconButton(
-                                onClick = { isFullscreen = !isFullscreen },
+                                onClick = { setFullscreen(!currentFullscreen) },
                                 modifier = Modifier.size(32.dp)
                             ) {
                                 Icon(
-                                    imageVector = if (isFullscreen) Icons.Default.FullscreenExit else Icons.Default.Fullscreen,
+                                    imageVector = if (currentFullscreen) Icons.Default.FullscreenExit else Icons.Default.Fullscreen,
                                     contentDescription = "Toggle Fullscreen",
                                     tint = Color.White,
                                     modifier = Modifier.size(20.dp)
